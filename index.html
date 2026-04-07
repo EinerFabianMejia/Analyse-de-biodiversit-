@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>ULaval Biodiversite</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+<link rel="stylesheet" href="Style.css">
+</head>
+<body>
+<div id="sidebar">
+  <div class="logo">
+    <img src="ulaval2.png" alt="ULaval Logo">
+    <h2>Biodiversite</h2>
+  </div>
+
+  <div class="menu-item" onclick="goHome()">
+    <i class="fa-solid fa-house"></i>
+    <span>Accueil</span>
+  </div>
+
+  <div class="menu-item" onclick="toggleGroup('classList')">
+    <i class="fa-solid fa-layer-group"></i>
+    <span>Classification</span>
+  </div>
+
+  <div id="classList" class="sub-list">Chargement des classes...</div>
+
+  <div class="menu-item" onclick="toggleGroup('timeControl')">
+    <i class="fa-solid fa-clock"></i>
+    <span>Suivi temporel</span>
+  </div>
+
+  <div id="timeControl" class="sub-list">
+    <div class="time-card">
+      <div class="time-card-header">
+        <span class="time-card-label">Annee active</span>
+        <span id="yearLabel" class="time-year-pill">2025</span>
+      </div>
+      <input type="range" id="yearSlider" min="2020" max="2025" step="1" value="2025">
+      <div class="time-actions">
+        <button class="time-btn" onclick="playAnimation()">Animation</button>
+        <button class="time-btn secondary" onclick="stopAnimation()">Pause</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-item" onclick="toggleGroup('obsList')">
+    <i class="fa-solid fa-magnifying-glass-location"></i>
+    <span>Observations</span>
+  </div>
+
+  <div id="obsList" class="sub-list">
+    <label><input type="checkbox" class="obsType" value="Mammiferes"> Mammiferes</label>
+    <label><input type="checkbox" class="obsType" value="Oiseaux"> Oiseaux</label>
+    <label><input type="checkbox" class="obsType" value="Reptiles"> Reptiles</label>
+    <label><input type="checkbox" class="obsType" value="Amphibiens"> Amphibiens</label>
+    <label><input type="checkbox" class="obsType" value="Poissons"> Poissons</label>
+    <label><input type="checkbox" class="obsType" value="Insectes"> Insectes</label>
+    <label><input type="checkbox" class="obsType" value="Arachnides"> Arachnides</label>
+    <label><input type="checkbox" class="obsType" value="Mollusques"> Mollusques</label>
+    <label><input type="checkbox" class="obsType" value="Plantes"> Plantes</label>
+    <label><input type="checkbox" class="obsType" value="Champignons"> Champignons</label>
+    <label><input type="checkbox" class="obsType" value="Protozoaires"> Protozoaires</label>
+    <label><input type="checkbox" class="obsType" value="Chromistes"> Chromistes</label>
+    <label><input type="checkbox" class="obsType" value="AutresAnimaux"> Autres animaux</label>
+    <button onclick="loadAllProjectObservations()">
+      <i class="fa-solid fa-globe"></i> Charger toutes especes
+    </button>
+  </div>
+</div>
+
+<div id="map"></div>
+<div id="infoPanel">Selectionnez une classe pour voir la superficie</div>
+<div id="classLegendPanel" class="map-legend">
+  <div class="legend-title">Legende des classes</div>
+  <div id="classLegendContent">Chargement de la legende...</div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<script src="https://unpkg.com/leaflet-idw@0.0.6/dist/leaflet-idw.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
