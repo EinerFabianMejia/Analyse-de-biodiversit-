@@ -3,11 +3,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const serverBase = window.location.origin;
   const apiBase = serverBase.startsWith("http") ? serverBase : "";
   const geoserverBase = apiBase ? apiBase + "/geoserver" : directGeoserverBase;
+  let currentLanguage = localStorage.getItem("inrsLanguage") || "fr";
 
   const campusConfig = {
     qc: {
       key: "qc",
-      label: "INRS Quebec",
+      label: { fr: "INRS Quebec", en: "INRS Quebec" },
       center: [46.79643680007479, -71.30277395255203],
       zoom: 17,
       secteur: "ne:INRS_emprise_Qc",
@@ -21,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     },
     laval: {
       key: "laval",
-      label: "INRS Laval",
+      label: { fr: "INRS Laval", en: "INRS Laval" },
       center: [45.54543960384367, -73.7202473476199],
       zoom: 17,
       secteur: "ne:INRS_emprise_Laval",
@@ -35,6 +36,176 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
 
+  const translations = {
+    fr: {
+      app_title: "Biodiversite INRS",
+      app_subtitle: "Deux campus, une interface claire pour suivre les habitats et les observations.",
+      language: "Langue",
+      home: "Accueil",
+      campus_menu: "Campus INRS",
+      campus_qc: "INRS Quebec",
+      campus_qc_address: "2605 Bd du Parc-Technologique",
+      campus_laval: "INRS Laval",
+      campus_laval_address: "531 Boul. des Prairies",
+      habitat_classification: "Classification habitat",
+      loading_classes: "Chargement des classes...",
+      temporal_tracking: "Suivi temporel",
+      active_year: "Annee active",
+      surface_chart: "Graphique superficies",
+      export_png: "Exporter carte PNG",
+      monthly_report: "Generer rapport mensuel",
+      observations: "Observations iNaturalist",
+      load_observations: "Charger observations",
+      remove_observations: "Retirer observations",
+      select_campus_hint: "Selectionnez un campus pour afficher la classification et les observations.",
+      class_legend: "Legende des classes",
+      loading_legend: "Chargement de la legende...",
+      loading: "Chargement...",
+      close: "Fermer",
+      no_legend: "Aucune legende disponible.",
+      no_classes: "Aucune classe disponible.",
+      realtime_observations: "Observations iNaturalist temps reel",
+      campus: "Campus",
+      classification_year: "Annee classification",
+      statistics: "Statistiques",
+      observations_removed: "Observations retirees de la carte.",
+      french_name: "Nom francais",
+      type: "Type",
+      quality: "Qualite",
+      date: "Date",
+      unknown: "Inconnue",
+      source_link: "Voir l'observation source",
+      export_error: "Impossible d'exporter l'image de la carte.",
+      export_title: "Carte de biodiversite INRS",
+      export_subtitle: "{campus} | Classification {year} | Observations iNaturalist",
+      exported_on: "Exporte le",
+      scale: "Echelle",
+      scale_unavailable: "Echelle non disponible",
+      platform_footer: "Plateforme biodiversite campus INRS",
+      source_footer: "Source : GeoServer + iNaturalist",
+      report_title: "Rapport mensuel biodiversite INRS",
+      month: "Mois",
+      observation_types: "Types d'observations affiches",
+      observation_srs: "Systeme de reference des observations",
+      classification_srs: "Systeme de reference de la classification carte",
+      observation_stats: "Statistiques observations",
+      total: "Total",
+      class_label: "Classe",
+      area_label: "Superficie",
+      summary: "Resume",
+      report_summary_text: "Ce rapport resume l'etat courant des observations iNaturalist filtrees en Research et Needs ID, ainsi que la superficie des classes de la classification pour {campus} en {year}.",
+      chart_loading: "Chargement du graphique...",
+      chart_error: "Impossible de charger le graphique.",
+      chart_subtitle: "{campus} - evolution des superficies par classe",
+      area_axis: "Superficie (ha)",
+      year_axis: "Annee",
+      base_map: "Carte",
+      street_map: "Street",
+      satellite_map: "Satellite",
+      topo_map: "Topo",
+      footprint: "Emprise",
+      map_classification: "Classification",
+      research_label: "Research",
+      needs_id_label: "Needs ID"
+    },
+    en: {
+      app_title: "INRS Biodiversity",
+      app_subtitle: "Two campuses, one clear interface to monitor habitats and observations.",
+      language: "Language",
+      home: "Home",
+      campus_menu: "INRS Campuses",
+      campus_qc: "INRS Quebec",
+      campus_qc_address: "2605 Parc-Technologique Blvd",
+      campus_laval: "INRS Laval",
+      campus_laval_address: "531 des Prairies Blvd",
+      habitat_classification: "Habitat classification",
+      loading_classes: "Loading classes...",
+      temporal_tracking: "Temporal tracking",
+      active_year: "Active year",
+      surface_chart: "Area chart",
+      export_png: "Export PNG map",
+      monthly_report: "Generate monthly report",
+      observations: "iNaturalist observations",
+      load_observations: "Load observations",
+      remove_observations: "Remove observations",
+      select_campus_hint: "Select a campus to display classification and observations.",
+      class_legend: "Class legend",
+      loading_legend: "Loading legend...",
+      loading: "Loading...",
+      close: "Close",
+      no_legend: "No legend available.",
+      no_classes: "No class available.",
+      realtime_observations: "Real-time iNaturalist observations",
+      campus: "Campus",
+      classification_year: "Classification year",
+      statistics: "Statistics",
+      observations_removed: "Observations removed from the map.",
+      french_name: "French name",
+      type: "Type",
+      quality: "Quality",
+      date: "Date",
+      unknown: "Unknown",
+      source_link: "View source observation",
+      export_error: "Unable to export the map image.",
+      export_title: "INRS biodiversity map",
+      export_subtitle: "{campus} | Classification {year} | iNaturalist observations",
+      exported_on: "Exported on",
+      scale: "Scale",
+      scale_unavailable: "Scale unavailable",
+      platform_footer: "INRS campus biodiversity platform",
+      source_footer: "Source: GeoServer + iNaturalist",
+      report_title: "INRS monthly biodiversity report",
+      month: "Month",
+      observation_types: "Displayed observation types",
+      observation_srs: "Observation reference system",
+      classification_srs: "Map classification reference system",
+      observation_stats: "Observation statistics",
+      total: "Total",
+      class_label: "Class",
+      area_label: "Area",
+      summary: "Summary",
+      report_summary_text: "This report summarizes the current state of iNaturalist observations filtered as Research and Needs ID, as well as the class areas of the classification for {campus} in {year}.",
+      chart_loading: "Loading chart...",
+      chart_error: "Unable to load the chart.",
+      chart_subtitle: "{campus} - class area evolution",
+      area_axis: "Area (ha)",
+      year_axis: "Year",
+      base_map: "Map",
+      street_map: "Street",
+      satellite_map: "Satellite",
+      topo_map: "Topo",
+      footprint: "Footprint",
+      map_classification: "Classification",
+      research_label: "Research",
+      needs_id_label: "Needs ID"
+    }
+  };
+
+  const classNameTranslations = {
+    Gazon: { fr: "Gazon", en: "Lawn" },
+    SurfacesImpermeables: { fr: "SurfacesImpermeables", en: "ImperviousSurfaces" },
+    Infrastructures: { fr: "Infrastructures", en: "Infrastructure" },
+    BoiseUrbain: { fr: "BoiseUrbain", en: "UrbanWoodland" },
+    SurfaceMinerales: { fr: "SurfaceMinerales", en: "MineralSurfaces" },
+    JardinAgricultureUrbaine: { fr: "JardinAgricultureUrbaine", en: "UrbanAgricultureGarden" }
+  };
+
+  const groupLabels = {
+    Mammiferes: { fr: "Mammiferes", en: "Mammals" },
+    Oiseaux: { fr: "Oiseaux", en: "Birds" },
+    Reptiles: { fr: "Reptiles", en: "Reptiles" },
+    Amphibiens: { fr: "Amphibiens", en: "Amphibians" },
+    Poissons: { fr: "Poissons", en: "Fish" },
+    Insectes: { fr: "Insectes", en: "Insects" },
+    Arachnides: { fr: "Arachnides", en: "Arachnids" },
+    Mollusques: { fr: "Mollusques", en: "Molluscs" },
+    Plantes: { fr: "Plantes", en: "Plants" },
+    Champignons: { fr: "Champignons", en: "Fungi" },
+    Protozoaires: { fr: "Protozoaires", en: "Protozoa" },
+    Chromistes: { fr: "Chromistes", en: "Chromists" },
+    AutresAnimaux: { fr: "Autres animaux", en: "Other animals" }
+  };
+
   const classColorById = {
     0: "#198f35",
     1: "#e0c8f1",
@@ -46,7 +217,32 @@ document.addEventListener("DOMContentLoaded", function () {
   const fallbackPalette = ["#198f35", "#e0c8f1", "#929ca0", "#4cf643", "#0d0ced", "#a2f2b5"];
 
   const map = L.map("map").setView(campusConfig.qc.center, campusConfig.qc.zoom);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png").addTo(map);
+  const baseLayers = {
+    Carte: L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+      attribution: "&copy; OpenStreetMap &copy; CARTO"
+    }),
+    Street: L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors"
+    }),
+    Satellite: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+      attribution: "Tiles &copy; Esri"
+    }),
+    Topo: L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenTopoMap contributors"
+    })
+  };
+  baseLayers.Carte.addTo(map);
+  const baseLayerRefs = {
+    carte: baseLayers.Carte,
+    street: baseLayers.Street,
+    satellite: baseLayers.Satellite,
+    topo: baseLayers.Topo
+  };
+  const overlayLayerRefs = {
+    footprint: null,
+    classification: null
+  };
+  let layerControl = null;
   L.control.scale({ imperial: false, position: "bottomleft" }).addTo(map);
 
   const markers = L.layerGroup().addTo(map);
@@ -55,8 +251,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const classLegendContent = document.getElementById("classLegendContent");
   const classLegendPanel = document.getElementById("classLegendPanel");
   const infoPanel = document.getElementById("infoPanel");
-  const addressSearch = document.getElementById("addressSearch");
-  const searchSuggestions = document.getElementById("searchSuggestions");
+  const languageSelect = document.getElementById("languageSelect");
   const chartModal = document.getElementById("chartModal");
   const chartModalSubtitle = document.getElementById("chartModalSubtitle");
   const classAreaCanvas = document.getElementById("classAreaChart");
@@ -68,9 +263,6 @@ document.addEventListener("DOMContentLoaded", function () {
   let campusMarker = null;
   let interval = null;
   let observationsRefreshInterval = null;
-  let searchMarker = null;
-  let searchAbortController = null;
-  let searchDebounce = null;
   let classMetadata = [];
   let allObservations = [];
   let loadedIds = new Set();
@@ -92,84 +284,64 @@ document.addEventListener("DOMContentLoaded", function () {
       .replaceAll("'", "&#39;");
   }
 
-  function hideSearchSuggestions() {
-    if (!searchSuggestions) return;
-    searchSuggestions.style.display = "none";
-    searchSuggestions.innerHTML = "";
-  }
-
-  function showSearchSuggestions(items) {
-    if (!searchSuggestions) return;
-
-    if (!items.length) {
-      searchSuggestions.innerHTML = '<div class="search-empty">Aucune suggestion trouvee.</div>';
-      searchSuggestions.style.display = "block";
-      return;
-    }
-
-    searchSuggestions.innerHTML = items.map((item) => `
-      <button
-        type="button"
-        class="search-suggestion"
-        data-lat="${escapeHtml(item.lat)}"
-        data-lon="${escapeHtml(item.lon)}"
-        data-label="${escapeHtml(item.display_name || item.name || "")}"
-      >
-        <span class="search-suggestion-title">${escapeHtml(item.name || item.display_name || "Resultat")}</span>
-        <span class="search-suggestion-subtitle">${escapeHtml(item.display_name || "")}</span>
-      </button>
-    `).join("");
-
-    searchSuggestions.style.display = "block";
-
-    searchSuggestions.querySelectorAll(".search-suggestion").forEach((button) => {
-      button.addEventListener("click", function () {
-        const lat = Number(this.dataset.lat);
-        const lon = Number(this.dataset.lon);
-        const label = this.dataset.label || "Adresse";
-        if (Number.isNaN(lat) || Number.isNaN(lon)) return;
-
-        map.setView([lat, lon], 18);
-
-        if (searchMarker) {
-          map.removeLayer(searchMarker);
-        }
-
-        searchMarker = L.marker([lat, lon]).addTo(map).bindPopup(label).openPopup();
-        addressSearch.value = label;
-        hideSearchSuggestions();
-      });
+  function t(key, vars = {}) {
+    let text = translations[currentLanguage]?.[key] || translations.fr[key] || key;
+    Object.entries(vars).forEach(([name, value]) => {
+      text = text.replaceAll(`{${name}}`, value);
     });
+    return text;
   }
 
-  async function fetchAddressSuggestions(query) {
-    if (!query || query.trim().length < 3) {
-      hideSearchSuggestions();
-      return;
-    }
+  function translateClassName(name) {
+    return classNameTranslations[name]?.[currentLanguage] || name;
+  }
 
-    if (searchAbortController) {
-      searchAbortController.abort();
-    }
+  function translateGroupName(name) {
+    return groupLabels[name]?.[currentLanguage] || name;
+  }
 
-    searchAbortController = new AbortController();
+  function campusLabel(name) {
+    return campusConfig[name]?.label?.[currentLanguage] || campusConfig[name]?.label?.fr || name;
+  }
 
-    try {
-      const response = await fetch(
-        "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&countrycodes=ca&q=" +
-          encodeURIComponent(query),
-        {
-          signal: searchAbortController.signal,
-          headers: { Accept: "application/json" }
-        }
-      );
-      const results = await response.json();
-      showSearchSuggestions(results);
-    } catch (error) {
-      if (error.name !== "AbortError") {
-        console.error("Erreur suggestions adresse:", error);
-      }
-    }
+  function getLocalizedBaseLayers() {
+    return {
+      [t("base_map")]: baseLayerRefs.carte,
+      [t("street_map")]: baseLayerRefs.street,
+      [t("satellite_map")]: baseLayerRefs.satellite,
+      [t("topo_map")]: baseLayerRefs.topo
+    };
+  }
+
+  function getLocalizedOverlayLayers() {
+    return {
+      [t("footprint")]: overlayLayerRefs.footprint,
+      [t("map_classification")]: overlayLayerRefs.classification
+    };
+  }
+
+  function refreshLayerControl() {
+    if (layerControl) map.removeControl(layerControl);
+    layerControl = L.control.layers(getLocalizedBaseLayers(), getLocalizedOverlayLayers(), {
+      collapsed: true
+    }).addTo(map);
+  }
+
+  function applyTranslations() {
+    document.documentElement.lang = currentLanguage;
+    document.title = t("app_title");
+    document.querySelectorAll("[data-i18n]").forEach((node) => {
+      node.textContent = t(node.dataset.i18n);
+    });
+    document.querySelectorAll("[data-group-label]").forEach((node) => {
+      node.textContent = translateGroupName(node.dataset.groupLabel);
+    });
+    if (languageSelect) languageSelect.value = currentLanguage;
+    renderClassFilters();
+    renderClassLegend();
+    renderObservationsInfoPanel();
+    applyObservationTypeColors();
+    refreshLayerControl();
   }
 
   function normalizeClassEntry(entry, index) {
@@ -187,7 +359,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function formatArea(surfaceM2) {
     if (!surfaceM2) return "0 ha";
-    return (surfaceM2 / 10000).toLocaleString("fr-CA", {
+    return (surfaceM2 / 10000).toLocaleString(currentLanguage === "en" ? "en-CA" : "fr-CA", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }) + " ha";
@@ -222,6 +394,22 @@ document.addEventListener("DOMContentLoaded", function () {
     clone.style.borderRadius = "18px";
     clone.style.boxShadow = "0 12px 28px rgba(15,23,42,0.1)";
     return clone;
+  }
+
+  function renderObservationsInfoPanel() {
+    const researchCount = allObservations.filter((obs) => obs.quality_grade === "research").length;
+    const needsIdCount = allObservations.filter((obs) => obs.quality_grade === "needs_id").length;
+    const total = researchCount + needsIdCount;
+    const researchPercent = total ? ((researchCount / total) * 100).toFixed(1) : "0.0";
+    const needsIdPercent = total ? ((needsIdCount / total) * 100).toFixed(1) : "0.0";
+    infoPanel.innerHTML = `
+      <b>${escapeHtml(t("realtime_observations"))} :</b> ${escapeHtml(allObservations.length)}<br><br>
+      <b>${escapeHtml(t("campus"))} :</b> ${escapeHtml(campusLabel(currentCampus))}<br>
+      <b>${escapeHtml(t("classification_year"))} :</b> ${escapeHtml(currentYear || "-")}<br><br>
+      <b>${escapeHtml(t("statistics"))} :</b><br>
+      ${escapeHtml(t("research_label"))} : ${escapeHtml(researchPercent)}%<br>
+      ${escapeHtml(t("needs_id_label"))} : ${escapeHtml(needsIdPercent)}%
+    `;
   }
 
   function wait(ms) {
@@ -277,7 +465,7 @@ document.addEventListener("DOMContentLoaded", function () {
       attribution: "&copy; OpenStreetMap &copy; CARTO"
     }).addTo(exportMap);
 
-    const campus = campusConfig[currentCampus];
+    const campus = campusLabel(currentCampus);
     L.tileLayer.wms(geoserverBase + "/ne/wms", {
       layers: campus.secteur,
       format: "image/png",
@@ -330,7 +518,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function renderClassFilters() {
     if (!classMetadata.length) {
-      classListEl.innerHTML = '<div class="loading-text">Aucune classe disponible.</div>';
+      classListEl.innerHTML = `<div class="loading-text">${escapeHtml(t("no_classes"))}</div>`;
       return;
     }
 
@@ -344,7 +532,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <span class="class-option-swatch" style="background:${escapeHtml(item.color)}"></span>
           <span class="class-option-body">
             <span class="class-option-area">${escapeHtml(formatArea(item.surface_m2))}</span>
-            <span class="class-option-name">${escapeHtml(item.name)}</span>
+              <span class="class-option-name">${escapeHtml(translateClassName(item.name))}</span>
           </span>
         </label>
       `;
@@ -355,14 +543,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function renderClassLegend() {
     if (!classMetadata.length) {
-      classLegendContent.innerHTML = '<div class="legend-hint">Aucune legende disponible.</div>';
+      classLegendContent.innerHTML = `<div class="legend-hint">${escapeHtml(t("no_legend"))}</div>`;
       return;
     }
 
     classLegendContent.innerHTML = `<div class="legend-list">${classMetadata.map((item) => `
       <div class="legend-item">
         <span class="legend-swatch" style="background:${escapeHtml(item.color)}"></span>
-        <span>${escapeHtml(item.name)}</span>
+          <span>${escapeHtml(translateClassName(item.name))}</span>
       </div>
     `).join("")}</div>`;
   }
@@ -442,8 +630,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   async function loadClassMetadata(year) {
-    classListEl.innerHTML = '<div class="loading-text">Chargement des classes...</div>';
-    classLegendContent.innerHTML = '<div class="loading-text">Chargement de la legende...</div>';
+    classListEl.innerHTML = `<div class="loading-text">${escapeHtml(t("loading_classes"))}</div>`;
+    classLegendContent.innerHTML = `<div class="loading-text">${escapeHtml(t("loading_legend"))}</div>`;
     try {
       const payload = await fetchClasses(year);
       classMetadata = (payload.classes || []).map(normalizeClassEntry).sort((a, b) => Number(a.id) - Number(b.id));
@@ -495,9 +683,12 @@ document.addEventListener("DOMContentLoaded", function () {
     currentYear = Number(year);
     if (classifLayer && map.hasLayer(classifLayer)) map.removeLayer(classifLayer);
     classifLayer = createLayer(currentYear).addTo(map);
+    overlayLayerRefs.classification = classifLayer;
     document.getElementById("yearLabel").innerText = currentYear;
     await loadClassMetadata(currentYear);
     updateClassification();
+    refreshLayerControl();
+    renderObservationsInfoPanel();
   }
 
   async function setupYearSlider() {
@@ -564,7 +755,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".obsType").forEach((checkbox) => {
       const label = checkbox.closest("label");
       if (!label) return;
-      const text = label.textContent.replace(/\s+/g, " ").trim();
+      const text = translateGroupName(checkbox.value);
       label.className = "obs-type-label";
         label.innerHTML = `
           <input type="checkbox" class="obsType" value="${escapeHtml(checkbox.value)}" ${checkbox.checked ? "checked" : ""}>
@@ -609,26 +800,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     renderObservations();
-    let researchCount = 0;
-    let needsIdCount = 0;
-
-    allObservations.forEach((obs) => {
-      if (obs.quality_grade === "research") researchCount++;
-      if (obs.quality_grade === "needs_id") needsIdCount++;
-    });
-
-    const total = researchCount + needsIdCount;
-    const researchPercent = total ? ((researchCount / total) * 100).toFixed(1) : "0.0";
-    const needsIdPercent = total ? ((needsIdCount / total) * 100).toFixed(1) : "0.0";
-
-    infoPanel.innerHTML = `
-      <b>Observations iNaturalist temps reel :</b> ${escapeHtml(allObservations.length)}<br><br>
-      <b>Campus :</b> ${escapeHtml(campus.label)}<br>
-      <b>Annee classification :</b> ${escapeHtml(currentYear || "-")}<br><br>
-      <b>Statistiques :</b><br>
-      Research : ${escapeHtml(researchPercent)}%<br>
-      Needs ID : ${escapeHtml(needsIdPercent)}%
-    `;
+    renderObservationsInfoPanel();
   }
 
   window.loadAllProjectObservations = function () {
@@ -645,7 +817,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".obsType").forEach((cb) => {
       cb.checked = false;
     });
-    infoPanel.innerHTML = "Observations retirees de la carte.";
+    infoPanel.innerHTML = escapeHtml(t("observations_removed"));
   };
 
   function renderObservations() {
@@ -678,7 +850,7 @@ document.addEventListener("DOMContentLoaded", function () {
         obs.taxon?.names?.find((item) => item.locale === "fr")?.name ||
         obs.species_guess ||
         obs.taxon?.name ||
-        "Observation";
+        t("observations");
       const frenchName =
         obs.taxon?.names?.find((item) => item.locale === "fr")?.name ||
         obs.taxon?.preferred_common_name ||
@@ -688,7 +860,7 @@ document.addEventListener("DOMContentLoaded", function () {
           ? "Research"
           : obs.quality_grade === "needs_id"
             ? "Needs ID"
-            : (obs.quality_grade || "Inconnue");
+            : (obs.quality_grade || t("unknown"));
       const imageUrl =
         obs.photos?.[0]?.url?.replace("square", "medium") ||
         obs.observation_photos?.[0]?.photo?.url?.replace("square", "medium") ||
@@ -699,11 +871,11 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="popup-card">
           ${imageUrl ? `<img class="popup-img" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(observationName)}">` : ""}
           <h3><span class="popup-type-dot" style="background:${escapeHtml(markerColor)}"></span>${escapeHtml(observationName)}</h3>
-          ${frenchName && frenchName !== observationName ? `<p><strong>Nom francais :</strong> ${escapeHtml(frenchName)}</p>` : ""}
-          <p><strong>Type :</strong> ${escapeHtml(groupFound)}</p>
-          <p><strong>Qualite :</strong> ${escapeHtml(quality)}</p>
-          <p><strong>Date :</strong> ${escapeHtml(obs.observed_on || "Inconnue")}</p>
-          <a class="popup-link" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noreferrer">Voir l'observation source</a>
+          ${frenchName && frenchName !== observationName ? `<p><strong>${escapeHtml(t("french_name"))} :</strong> ${escapeHtml(frenchName)}</p>` : ""}
+          <p><strong>${escapeHtml(t("type"))} :</strong> ${escapeHtml(translateGroupName(groupFound))}</p>
+          <p><strong>${escapeHtml(t("quality"))} :</strong> ${escapeHtml(quality)}</p>
+          <p><strong>${escapeHtml(t("date"))} :</strong> ${escapeHtml(obs.observed_on || t("unknown"))}</p>
+          <a class="popup-link" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noreferrer">${escapeHtml(t("source_link"))}</a>
         </div>
       `);
       markers.addLayer(marker);
@@ -729,8 +901,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   window.exportMapImage = async function () {
     try {
-      const campus = campusConfig[currentCampus];
-      const exportedAt = new Date().toLocaleString("fr-CA", {
+      const exportedAt = new Date().toLocaleString(currentLanguage === "en" ? "en-CA" : "fr-CA", {
         dateStyle: "medium",
         timeStyle: "short"
       });
@@ -761,14 +932,14 @@ document.addEventListener("DOMContentLoaded", function () {
       title.style.border = "1px solid rgba(15,23,42,0.08)";
       title.innerHTML = `
         <div>
-          <div style="font-size:31px;font-weight:800;color:#0d3d7d;line-height:1.08;">Carte de biodiversite INRS</div>
-          <div style="margin-top:7px;font-size:15px;color:#475569;">${escapeHtml(campus.label)} | Classification ${escapeHtml(currentYear)} | Observations iNaturalist</div>
-        </div>
-        <div style="display:grid;gap:8px;justify-items:end;">
-          <div style="padding:7px 12px;border-radius:999px;background:#eef2f8;color:#17345f;font-size:13px;font-weight:700;">Annee classification ${escapeHtml(currentYear)}</div>
-          <div style="font-size:13px;color:#64748b;">Exporte le ${escapeHtml(exportedAt)}</div>
-        </div>
-      `;
+            <div style="font-size:31px;font-weight:800;color:#0d3d7d;line-height:1.08;">${escapeHtml(t("export_title"))}</div>
+            <div style="margin-top:7px;font-size:15px;color:#475569;">${escapeHtml(t("export_subtitle", { campus: campusLabel(currentCampus), year: String(currentYear) }))}</div>
+          </div>
+          <div style="display:grid;gap:8px;justify-items:end;">
+            <div style="padding:7px 12px;border-radius:999px;background:#eef2f8;color:#17345f;font-size:13px;font-weight:700;">${escapeHtml(t("classification_year"))} ${escapeHtml(currentYear)}</div>
+            <div style="font-size:13px;color:#64748b;">${escapeHtml(t("exported_on"))} ${escapeHtml(exportedAt)}</div>
+          </div>
+        `;
 
       const mapImage = document.createElement("img");
       mapImage.src = mapCanvas.toDataURL("image/png");
@@ -801,7 +972,7 @@ document.addEventListener("DOMContentLoaded", function () {
       scaleCard.style.padding = "14px 16px";
       scaleCard.style.boxShadow = "0 12px 28px rgba(15,23,42,0.1)";
       scaleCard.style.border = "1px solid rgba(15,23,42,0.08)";
-      scaleCard.innerHTML = `<div style="font-size:13px;font-weight:700;color:#0d3d7d;margin-bottom:10px;">Echelle</div>`;
+      scaleCard.innerHTML = `<div style="font-size:13px;font-weight:700;color:#0d3d7d;margin-bottom:10px;">${escapeHtml(t("scale"))}</div>`;
 
       const liveScale = document.querySelector(".leaflet-control-scale");
       if (liveScale) {
@@ -812,7 +983,7 @@ document.addEventListener("DOMContentLoaded", function () {
         scaleCard.appendChild(scaleClone);
       } else {
         const noScale = document.createElement("div");
-        noScale.textContent = "Echelle non disponible";
+        noScale.textContent = t("scale_unavailable");
         noScale.style.fontSize = "12px";
         noScale.style.color = "#64748b";
         scaleCard.appendChild(noScale);
@@ -839,8 +1010,8 @@ document.addEventListener("DOMContentLoaded", function () {
       footer.style.justifyContent = "space-between";
       footer.style.gap = "16px";
       footer.innerHTML = `
-        <span>Plateforme biodiversite campus INRS</span>
-        <span>Source : GeoServer + iNaturalist</span>
+        <span>${escapeHtml(t("platform_footer"))}</span>
+        <span>${escapeHtml(t("source_footer"))}</span>
       `;
 
       exportWrapper.appendChild(title);
@@ -869,7 +1040,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }, "image/png");
     } catch (error) {
       console.error(error);
-      infoPanel.innerHTML = "Impossible d'exporter l'image de la carte.";
+      infoPanel.innerHTML = escapeHtml(t("export_error"));
     }
   };
 
@@ -887,23 +1058,24 @@ document.addEventListener("DOMContentLoaded", function () {
     const total = researchCount + needsIdCount;
     const researchPercent = total ? ((researchCount / total) * 100).toFixed(1) : "0.0";
     const needsIdPercent = total ? ((needsIdCount / total) * 100).toFixed(1) : "0.0";
-    const monthLabel = now.toLocaleString("fr-CA", { month: "long", year: "numeric" });
+    const monthLabel = now.toLocaleString(currentLanguage === "en" ? "en-CA" : "fr-CA", { month: "long", year: "numeric" });
     const selectedObservationTypes = Array.from(document.querySelectorAll(".obsType:checked"))
       .map((cb) => cb.value)
-      .join(", ") || "Aucun";
+      .map((name) => translateGroupName(name))
+      .join(", ") || t("no_classes");
 
     const classRows = classMetadata.map((item) => `
       <tr>
-        <td>${escapeHtml(item.name)}</td>
-        <td>${escapeHtml(formatArea(item.surface_m2))}</td>
-      </tr>
-    `).join("");
+          <td>${escapeHtml(translateClassName(item.name))}</td>
+          <td>${escapeHtml(formatArea(item.surface_m2))}</td>
+        </tr>
+      `).join("");
 
     const report = `<!DOCTYPE html>
-<html lang="fr">
+<html lang="${escapeHtml(currentLanguage)}">
 <head>
   <meta charset="UTF-8">
-  <title>Rapport mensuel biodiversite INRS ${escapeHtml(monthLabel)}</title>
+  <title>${escapeHtml(t("report_title"))} ${escapeHtml(monthLabel)}</title>
   <style>
     body { font-family: Segoe UI, sans-serif; margin: 32px; color: #1f2937; }
     h1, h2 { color: #0d3d7d; }
@@ -915,30 +1087,30 @@ document.addEventListener("DOMContentLoaded", function () {
   </style>
 </head>
 <body>
-  <h1>Rapport mensuel biodiversite INRS</h1>
+  <h1>${escapeHtml(t("report_title"))}</h1>
   <div class="meta">
-    <strong>Mois :</strong> ${escapeHtml(monthLabel)}<br>
-    <strong>Campus :</strong> ${escapeHtml(campus.label)}<br>
-    <strong>Annee classification :</strong> ${escapeHtml(currentYear)}<br>
-    <strong>Types d'observations affiches :</strong> ${escapeHtml(selectedObservationTypes)}<br>
-    <strong>Systeme de reference des observations :</strong> EPSG:4326<br>
-    <strong>Systeme de reference de la classification carte :</strong> EPSG:4326
+    <strong>${escapeHtml(t("month"))} :</strong> ${escapeHtml(monthLabel)}<br>
+    <strong>${escapeHtml(t("campus"))} :</strong> ${escapeHtml(campus)}<br>
+    <strong>${escapeHtml(t("classification_year"))} :</strong> ${escapeHtml(currentYear)}<br>
+    <strong>${escapeHtml(t("observation_types"))} :</strong> ${escapeHtml(selectedObservationTypes)}<br>
+    <strong>${escapeHtml(t("observation_srs"))} :</strong> EPSG:4326<br>
+    <strong>${escapeHtml(t("classification_srs"))} :</strong> EPSG:4326
   </div>
 
   <div class="card">
-    <h2>Statistiques observations</h2>
-    <p><strong>Observations iNaturalist temps reel :</strong> ${escapeHtml(allObservations.length)}</p>
-    <p><strong>Research :</strong> ${escapeHtml(researchCount)} (${escapeHtml(researchPercent)}%)</p>
-    <p><strong>Needs ID :</strong> ${escapeHtml(needsIdCount)} (${escapeHtml(needsIdPercent)}%)</p>
+    <h2>${escapeHtml(t("observation_stats"))}</h2>
+    <p><strong>${escapeHtml(t("realtime_observations"))} :</strong> ${escapeHtml(allObservations.length)}</p>
+    <p><strong>${escapeHtml(t("research_label"))} :</strong> ${escapeHtml(researchCount)} (${escapeHtml(researchPercent)}%)</p>
+    <p><strong>${escapeHtml(t("needs_id_label"))} :</strong> ${escapeHtml(needsIdCount)} (${escapeHtml(needsIdPercent)}%)</p>
   </div>
 
   <div class="card">
-    <h2>Classification habitat</h2>
+    <h2>${escapeHtml(t("habitat_classification"))}</h2>
     <table>
       <thead>
         <tr>
-          <th>Classe</th>
-          <th>Superficie</th>
+          <th>${escapeHtml(t("class_label"))}</th>
+          <th>${escapeHtml(t("area_label"))}</th>
         </tr>
       </thead>
       <tbody>
@@ -948,8 +1120,8 @@ document.addEventListener("DOMContentLoaded", function () {
   </div>
 
   <div class="card">
-    <h2>Resume</h2>
-    <p>Ce rapport resume l'etat courant des observations iNaturalist filtrees en Research et Needs ID, ainsi que la superficie des classes de la classification pour ${escapeHtml(campus.label)} en ${escapeHtml(currentYear)}.</p>
+    <h2>${escapeHtml(t("summary"))}</h2>
+    <p>${escapeHtml(t("report_summary_text", { campus, year: String(currentYear) }))}</p>
   </div>
 </body>
 </html>`;
@@ -985,6 +1157,7 @@ document.addEventListener("DOMContentLoaded", function () {
       format: "image/png",
       transparent: true
     }).addTo(map);
+    overlayLayerRefs.footprint = secteurLayer;
 
     await setupYearSlider();
     document.querySelectorAll(".obsType").forEach((cb) => {
@@ -992,6 +1165,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     await loadAllProjectObservations(true);
     startObservationsAutoRefresh();
+    refreshLayerControl();
   };
 
   map.on("click", function (e) {
@@ -1013,8 +1187,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!data.features || !data.features.length) return;
         const props = data.features[0].properties || {};
         L.popup().setLatLng(e.latlng).setContent(`
-          <b>Classe :</b> ${escapeHtml(props.nom_classe || props.class || "Inconnue")}<br>
-          <b>Superficie :</b> ${escapeHtml(formatArea(props.surface_m2 || 0))}
+          <b>${escapeHtml(t("class_label"))} :</b> ${escapeHtml(translateClassName(props.nom_classe || props.class || t("unknown")))}<br>
+          <b>${escapeHtml(t("area_label"))} :</b> ${escapeHtml(formatArea(props.surface_m2 || 0))}
         `).openOn(map);
       })
       .catch((error) => console.error(error));
@@ -1030,7 +1204,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   window.openClassChart = async function () {
     chartModal.classList.add("is-open");
-    chartModalSubtitle.innerText = "Chargement du graphique...";
+    chartModalSubtitle.innerText = t("chart_loading");
     destroyClassChart();
 
     try {
@@ -1055,7 +1229,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       const datasets = Array.from(classMap.entries()).map(([classId, meta]) => ({
-        label: meta.name,
+        label: translateClassName(meta.name),
         data: years.map((year) => {
           const yearData = series.find((entry) => entry.year === year);
           const found = yearData?.classes.find((item) => Number(item.id) === Number(classId));
@@ -1083,7 +1257,7 @@ document.addEventListener("DOMContentLoaded", function () {
             tooltip: {
               callbacks: {
                 label: function (context) {
-                  return context.dataset.label + ": " + context.parsed.y.toLocaleString("fr-CA") + " ha";
+                  return context.dataset.label + ": " + context.parsed.y.toLocaleString(currentLanguage === "en" ? "en-CA" : "fr-CA") + " ha";
                 }
               }
             }
@@ -1092,47 +1266,25 @@ document.addEventListener("DOMContentLoaded", function () {
             y: {
               title: {
                 display: true,
-                text: "Superficie (ha)"
+                text: t("area_axis")
               }
             },
             x: {
               title: {
                 display: true,
-                text: "Annee"
+                text: t("year_axis")
               }
             }
           }
         }
       });
 
-      chartModalSubtitle.innerText = campusConfig[currentCampus].label + " - evolution des superficies par classe";
+      chartModalSubtitle.innerText = t("chart_subtitle", { campus: campusLabel(currentCampus) });
     } catch (error) {
       console.error(error);
-      chartModalSubtitle.innerText = "Impossible de charger le graphique.";
+      chartModalSubtitle.innerText = t("chart_error");
     }
   };
-
-  if (addressSearch) {
-    addressSearch.addEventListener("input", function () {
-      clearTimeout(searchDebounce);
-      const value = this.value;
-      searchDebounce = setTimeout(() => {
-        fetchAddressSuggestions(value);
-      }, 250);
-    });
-
-    addressSearch.addEventListener("focus", function () {
-      if (this.value.trim().length >= 3) {
-        fetchAddressSuggestions(this.value);
-      }
-    });
-  }
-
-  document.addEventListener("click", function (event) {
-    if (!event.target.closest("#searchPanel")) {
-      hideSearchSuggestions();
-    }
-  });
 
   chartModal.addEventListener("click", function (event) {
     if (event.target === chartModal) {
@@ -1140,5 +1292,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  if (languageSelect) {
+    languageSelect.value = currentLanguage;
+    languageSelect.addEventListener("change", function () {
+      currentLanguage = this.value || "fr";
+      localStorage.setItem("inrsLanguage", currentLanguage);
+      applyTranslations();
+    });
+  }
+
   loadCampus("qc");
+  applyTranslations();
 });

@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Biodiversite INRS</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -16,116 +15,109 @@
 <div id="sidebar">
   <div class="logo">
     <img src="INRS.jpeg" alt="Logo INRS">
-    <h2>Biodiversite INRS</h2>
-    <p>Deux campus, une interface claire pour suivre les habitats et les observations.</p>
+    <h2 data-i18n="app_title">Biodiversite INRS</h2>
+    <p data-i18n="app_subtitle">Deux campus, une interface claire pour suivre les habitats et les observations.</p>
+  </div>
+
+  <div class="language-switch">
+    <span class="language-label" data-i18n="language">Langue</span>
+    <select id="languageSelect" aria-label="Language selector">
+      <option value="fr">FR</option>
+      <option value="en">EN</option>
+    </select>
   </div>
 
   <div class="menu-item" onclick="goHome()">
     <i class="fa-solid fa-house"></i>
-    <span>Accueil</span>
+    <span data-i18n="home">Accueil</span>
   </div>
 
   <div class="menu-item" onclick="toggleGroup('campusList')">
     <i class="fa-solid fa-location-dot"></i>
-    <span>Campus INRS</span>
+    <span data-i18n="campus_menu">Campus INRS</span>
   </div>
 
   <div id="campusList" class="sub-list">
     <button class="campus-btn" onclick="loadCampus('qc')">
-      <span class="campus-name">INRS Quebec</span>
-      <span class="campus-address">2605 Bd du Parc-Technologique</span>
+      <span class="campus-name" data-i18n="campus_qc">INRS Quebec</span>
+      <span class="campus-address" data-i18n="campus_qc_address">2605 Bd du Parc-Technologique</span>
     </button>
     <button class="campus-btn" onclick="loadCampus('laval')">
-      <span class="campus-name">INRS Laval</span>
-      <span class="campus-address">531 Boul. des Prairies</span>
+      <span class="campus-name" data-i18n="campus_laval">INRS Laval</span>
+      <span class="campus-address" data-i18n="campus_laval_address">531 Boul. des Prairies</span>
     </button>
   </div>
 
   <div class="menu-item" onclick="toggleGroup('classList')">
     <i class="fa-solid fa-layer-group"></i>
-    <span>Classification habitat</span>
+    <span data-i18n="habitat_classification">Classification habitat</span>
   </div>
 
-  <div id="classList" class="sub-list">Chargement des classes...</div>
+  <div id="classList" class="sub-list" data-i18n="loading_classes">Chargement des classes...</div>
 
   <div class="menu-item" onclick="toggleGroup('timeControl')">
     <i class="fa-solid fa-clock"></i>
-    <span>Suivi temporel</span>
+    <span data-i18n="temporal_tracking">Suivi temporel</span>
   </div>
 
   <div id="timeControl" class="sub-list">
     <div class="time-card">
       <div class="time-card-header">
-        <span class="time-card-label">Annee active</span>
+        <span class="time-card-label" data-i18n="active_year">Annee active</span>
         <span id="yearLabel" class="time-year-pill">--</span>
       </div>
       <input type="range" id="yearSlider" min="2020" max="2025" step="1" value="2025">
       <div class="time-actions">
-        <button class="time-btn chart-btn" onclick="openClassChart()">Graphique superficies</button>
-        <button class="time-btn export-btn" onclick="exportMapImage()">Exporter carte PNG</button>
-        <button class="time-btn report-btn" onclick="generateMonthlyReport()">Generer rapport mensuel</button>
+        <button class="time-btn chart-btn" onclick="openClassChart()" data-i18n="surface_chart">Graphique superficies</button>
+        <button class="time-btn export-btn" onclick="exportMapImage()" data-i18n="export_png">Exporter carte PNG</button>
+        <button class="time-btn report-btn" onclick="generateMonthlyReport()" data-i18n="monthly_report">Generer rapport mensuel</button>
       </div>
     </div>
   </div>
 
   <div class="menu-item" onclick="openObservationsPanel()">
     <i class="fa-solid fa-magnifying-glass-location"></i>
-    <span>Observations iNaturalist</span>
+    <span data-i18n="observations">Observations iNaturalist</span>
   </div>
 
   <div id="obsList" class="sub-list">
-    <label><input type="checkbox" class="obsType" value="Mammiferes"> Mammiferes</label>
-    <label><input type="checkbox" class="obsType" value="Oiseaux"> Oiseaux</label>
-    <label><input type="checkbox" class="obsType" value="Reptiles"> Reptiles</label>
-    <label><input type="checkbox" class="obsType" value="Amphibiens"> Amphibiens</label>
-    <label><input type="checkbox" class="obsType" value="Poissons"> Poissons</label>
-    <label><input type="checkbox" class="obsType" value="Insectes"> Insectes</label>
-    <label><input type="checkbox" class="obsType" value="Arachnides"> Arachnides</label>
-    <label><input type="checkbox" class="obsType" value="Mollusques"> Mollusques</label>
-    <label><input type="checkbox" class="obsType" value="Plantes"> Plantes</label>
-    <label><input type="checkbox" class="obsType" value="Champignons"> Champignons</label>
+    <label><input type="checkbox" class="obsType" value="Mammiferes"> <span data-group-label="Mammiferes">Mammiferes</span></label>
+    <label><input type="checkbox" class="obsType" value="Oiseaux"> <span data-group-label="Oiseaux">Oiseaux</span></label>
+    <label><input type="checkbox" class="obsType" value="Reptiles"> <span data-group-label="Reptiles">Reptiles</span></label>
+    <label><input type="checkbox" class="obsType" value="Amphibiens"> <span data-group-label="Amphibiens">Amphibiens</span></label>
+    <label><input type="checkbox" class="obsType" value="Poissons"> <span data-group-label="Poissons">Poissons</span></label>
+    <label><input type="checkbox" class="obsType" value="Insectes"> <span data-group-label="Insectes">Insectes</span></label>
+    <label><input type="checkbox" class="obsType" value="Arachnides"> <span data-group-label="Arachnides">Arachnides</span></label>
+    <label><input type="checkbox" class="obsType" value="Mollusques"> <span data-group-label="Mollusques">Mollusques</span></label>
+    <label><input type="checkbox" class="obsType" value="Plantes"> <span data-group-label="Plantes">Plantes</span></label>
+    <label><input type="checkbox" class="obsType" value="Champignons"> <span data-group-label="Champignons">Champignons</span></label>
     <button onclick="loadAllProjectObservations()">
       <i class="fa-solid fa-globe"></i>
-      Charger observations
+      <span data-i18n="load_observations">Charger observations</span>
     </button>
     <button class="time-btn secondary" onclick="clearAllObservations()">
       <i class="fa-solid fa-eraser"></i>
-      Retirer observations
+      <span data-i18n="remove_observations">Retirer observations</span>
     </button>
   </div>
 </div>
 
 <div id="map"></div>
-
-<div id="searchPanel">
-  <div class="search-panel-title">Chercher adresse</div>
-  <div class="search-input-wrap">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <input
-      id="addressSearch"
-      type="text"
-      placeholder="Chercher adresse"
-      autocomplete="off"
-    >
-  </div>
-  <div id="searchSuggestions" class="search-suggestions"></div>
-</div>
-
-<div id="infoPanel">Selectionnez un campus pour afficher la classification et les observations.</div>
+<div id="infoPanel" data-i18n="select_campus_hint">Selectionnez un campus pour afficher la classification et les observations.</div>
 
 <div id="classLegendPanel" class="map-legend">
-  <div class="legend-title">Legende des classes</div>
-  <div id="classLegendContent">Chargement de la legende...</div>
+  <div class="legend-title" data-i18n="class_legend">Legende des classes</div>
+  <div id="classLegendContent" data-i18n="loading_legend">Chargement de la legende...</div>
 </div>
 
 <div id="chartModal" class="chart-modal">
   <div class="chart-modal-card">
     <div class="chart-modal-header">
       <div>
-        <div class="chart-modal-title">Evolution des superficies</div>
-        <div id="chartModalSubtitle" class="chart-modal-subtitle">Chargement...</div>
+        <div class="chart-modal-title" data-i18n="surface_chart">Evolution des superficies</div>
+        <div id="chartModalSubtitle" class="chart-modal-subtitle" data-i18n="loading">Chargement...</div>
       </div>
-      <button class="chart-close" onclick="closeClassChart()">Fermer</button>
+      <button class="chart-close" onclick="closeClassChart()" data-i18n="close">Fermer</button>
     </div>
     <div class="chart-canvas-wrap">
       <canvas id="classAreaChart"></canvas>
@@ -134,7 +126,6 @@
 </div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

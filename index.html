@@ -6,7 +6,6 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -96,14 +95,6 @@
 </div>
 
 <div id="map"></div>
-<div id="searchPanel">
-  <div class="search-panel-title" data-i18n="search_address">Chercher adresse</div>
-  <div class="search-input-wrap">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <input id="addressSearch" type="text" placeholder="Chercher adresse" autocomplete="off">
-  </div>
-  <div id="searchSuggestions" class="search-suggestions"></div>
-</div>
 <div id="infoPanel" data-i18n="select_class_hint">Selectionnez une classe pour voir la superficie</div>
 <div id="classLegendPanel" class="map-legend">
   <div class="legend-title" data-i18n="class_legend">Legende des classes</div>
@@ -126,7 +117,6 @@
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script src="https://unpkg.com/leaflet-idw@0.0.6/dist/leaflet-idw.js"></script>
 <script src="script.js"></script>
 </body>
