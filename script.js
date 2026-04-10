@@ -374,11 +374,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function formatArea(surfaceM2) {
-    if (!surfaceM2) return "0 ha";
-    return (Number(surfaceM2) / 10000).toLocaleString(currentLanguage === "en" ? "en-CA" : "fr-CA", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }) + " ha";
+    if (!surfaceM2) return "0 m²";
+    return Number(surfaceM2).toLocaleString(currentLanguage === "en" ? "en-CA" : "fr-CA", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }) + " m²";
   }
 
   function getLocalizedBaseLayers() {
