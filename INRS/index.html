@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biodiversite INRS</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<link rel="stylesheet" href="Style.css">
+</head>
+<body>
+<div id="sidebar">
+  <div class="logo">
+    <img src="INRS.jpeg" alt="Logo INRS">
+    <h2>Biodiversite INRS</h2>
+    <p>Deux campus, une interface claire pour suivre les habitats et les observations.</p>
+  </div>
+
+  <div class="menu-item" onclick="goHome()">
+    <i class="fa-solid fa-house"></i>
+    <span>Accueil</span>
+  </div>
+
+  <div class="menu-item" onclick="toggleGroup('campusList')">
+    <i class="fa-solid fa-location-dot"></i>
+    <span>Campus INRS</span>
+  </div>
+
+  <div id="campusList" class="sub-list">
+    <button class="campus-btn" onclick="loadCampus('qc')">
+      <span class="campus-name">INRS Quebec</span>
+      <span class="campus-address">2605 Bd du Parc-Technologique</span>
+    </button>
+    <button class="campus-btn" onclick="loadCampus('laval')">
+      <span class="campus-name">INRS Laval</span>
+      <span class="campus-address">531 Boul. des Prairies</span>
+    </button>
+  </div>
+
+  <div class="menu-item" onclick="toggleGroup('classList')">
+    <i class="fa-solid fa-layer-group"></i>
+    <span>Classification habitat</span>
+  </div>
+
+  <div id="classList" class="sub-list">Chargement des classes...</div>
+
+  <div class="menu-item" onclick="toggleGroup('timeControl')">
+    <i class="fa-solid fa-clock"></i>
+    <span>Suivi temporel</span>
+  </div>
+
+  <div id="timeControl" class="sub-list">
+    <div class="time-card">
+      <div class="time-card-header">
+        <span class="time-card-label">Annee active</span>
+        <span id="yearLabel" class="time-year-pill">--</span>
+      </div>
+      <input type="range" id="yearSlider" min="2020" max="2025" step="1" value="2025">
+      <div class="time-actions">
+        <button class="time-btn chart-btn" onclick="openClassChart()">Graphique superficies</button>
+        <button class="time-btn export-btn" onclick="exportMapImage()">Exporter carte PNG</button>
+        <button class="time-btn report-btn" onclick="generateMonthlyReport()">Generer rapport mensuel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-item" onclick="openObservationsPanel()">
+    <i class="fa-solid fa-magnifying-glass-location"></i>
+    <span>Observations iNaturalist</span>
+  </div>
+
+  <div id="obsList" class="sub-list">
+    <label><input type="checkbox" class="obsType" value="Mammiferes"> Mammiferes</label>
+    <label><input type="checkbox" class="obsType" value="Oiseaux"> Oiseaux</label>
+    <label><input type="checkbox" class="obsType" value="Reptiles"> Reptiles</label>
+    <label><input type="checkbox" class="obsType" value="Amphibiens"> Amphibiens</label>
+    <label><input type="checkbox" class="obsType" value="Poissons"> Poissons</label>
+    <label><input type="checkbox" class="obsType" value="Insectes"> Insectes</label>
+    <label><input type="checkbox" class="obsType" value="Arachnides"> Arachnides</label>
+    <label><input type="checkbox" class="obsType" value="Mollusques"> Mollusques</label>
+    <label><input type="checkbox" class="obsType" value="Plantes"> Plantes</label>
+    <label><input type="checkbox" class="obsType" value="Champignons"> Champignons</label>
+    <button onclick="loadAllProjectObservations()">
+      <i class="fa-solid fa-globe"></i>
+      Charger observations
+    </button>
+    <button class="time-btn secondary" onclick="clearAllObservations()">
+      <i class="fa-solid fa-eraser"></i>
+      Retirer observations
+    </button>
+  </div>
+</div>
+
+<div id="map"></div>
+
+<div id="searchPanel">
+  <div class="search-panel-title">Chercher adresse</div>
+  <div class="search-input-wrap">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input
+      id="addressSearch"
+      type="text"
+      placeholder="Chercher adresse"
+      autocomplete="off"
+    >
+  </div>
+  <div id="searchSuggestions" class="search-suggestions"></div>
+</div>
+
+<div id="infoPanel">Selectionnez un campus pour afficher la classification et les observations.</div>
+
+<div id="classLegendPanel" class="map-legend">
+  <div class="legend-title">Legende des classes</div>
+  <div id="classLegendContent">Chargement de la legende...</div>
+</div>
+
+<div id="chartModal" class="chart-modal">
+  <div class="chart-modal-card">
+    <div class="chart-modal-header">
+      <div>
+        <div class="chart-modal-title">Evolution des superficies</div>
+        <div id="chartModalSubtitle" class="chart-modal-subtitle">Chargement...</div>
+      </div>
+      <button class="chart-close" onclick="closeClassChart()">Fermer</button>
+    </div>
+    <div class="chart-canvas-wrap">
+      <canvas id="classAreaChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

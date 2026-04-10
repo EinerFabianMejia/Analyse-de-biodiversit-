@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+arcgis_air_experience.html
+arcgis_air_item_data.json
+arcgis_air_layer.json
+arcgis_air_query.json
+rsqaq_stations.csv
+tmp_iqa_3028.html
