@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
   };
   const fallbackPalette = ["#198f35", "#e0c8f1", "#929ca0", "#4cf643", "#0d0ced", "#a2f2b5"];
 
-  const map = L.map("map").setView([46.781, -71.277], 15);
+  const map = L.map("map", { maxZoom: 22 }).setView([46.781, -71.277], 15);
   const baseLayers = {
     "Carte": L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
       attribution: "&copy; OpenStreetMap &copy; CARTO"
@@ -339,6 +339,16 @@ document.addEventListener("DOMContentLoaded", function () {
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#39;");
+  }
+
+  function createObservationSquareIcon(color) {
+    return L.divIcon({
+      className: "observation-square-icon",
+      html: `<span style="display:block;width:6px;height:6px;background:${escapeHtml(color)};border:1px solid rgba(255,255,255,0.92);box-shadow:0 0 0 1px rgba(0,0,0,0.12);"></span>`,
+      iconSize: [6, 6],
+      iconAnchor: [3, 3],
+      popupAnchor: [0, -4]
+    });
   }
 
   function t(key, vars = {}) {
@@ -909,12 +919,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const [lng, lat] = obs.geojson.coordinates;
       const markerColor = groupColors[groupFound] || "#0a73d9";
-      const marker = L.circleMarker([lat, lng], {
-        radius: 5,
-        color: markerColor,
-        fillColor: markerColor,
-        fillOpacity: 0.95,
-        weight: 1.5
+      const marker = L.marker([lat, lng], {
+        icon: createObservationSquareIcon(markerColor)
       });
 
       const observationName =
