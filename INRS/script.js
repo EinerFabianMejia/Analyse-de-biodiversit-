@@ -284,16 +284,6 @@ document.addEventListener("DOMContentLoaded", function () {
       .replaceAll("'", "&#39;");
   }
 
-  function createObservationSquareIcon(color) {
-    return L.divIcon({
-      className: "observation-square-icon",
-      html: `<span style="display:block;width:6px;height:6px;background:${escapeHtml(color)};border:1px solid rgba(255,255,255,0.92);box-shadow:0 0 0 1px rgba(0,0,0,0.12);"></span>`,
-      iconSize: [6, 6],
-      iconAnchor: [3, 3],
-      popupAnchor: [0, -4]
-    });
-  }
-
   function t(key, vars = {}) {
     let text = translations[currentLanguage]?.[key] || translations.fr[key] || key;
     Object.entries(vars).forEach(([name, value]) => {
@@ -498,8 +488,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const [lng, lat] = obs.geojson.coordinates;
       const markerColor = groupColors[groupFound] || "#0a73d9";
-      L.marker([lat, lng], {
-        icon: createObservationSquareIcon(markerColor)
+      L.circleMarker([lat, lng], {
+        radius: 5,
+        color: markerColor,
+        fillColor: markerColor,
+        fillOpacity: 0.95,
+        weight: 1.5
       }).addTo(exportMap);
     });
 
@@ -844,8 +838,12 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!groupFound || !selected.includes(groupFound)) return;
       const [lng, lat] = obs.geojson.coordinates;
       const markerColor = groupColors[groupFound] || "#0a73d9";
-      const marker = L.marker([lat, lng], {
-        icon: createObservationSquareIcon(markerColor)
+      const marker = L.circleMarker([lat, lng], {
+        radius: 5,
+        color: markerColor,
+        fillColor: markerColor,
+        fillOpacity: 0.95,
+        weight: 1.5
       });
       const observationName =
         obs.taxon?.preferred_common_name ||
