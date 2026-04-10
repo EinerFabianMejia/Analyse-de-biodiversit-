@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", function () {
       not_available: "Non disponible",
       export_error: "Impossible d'exporter l'image de la carte.",
       research_label: "Recherche",
-      needs_id_label: "A identifier",
+      needs_id_label: "ID manquant",
       observation_default_name: "Observation",
       air_category_good: "Bon",
       air_category_acceptable: "Acceptable",

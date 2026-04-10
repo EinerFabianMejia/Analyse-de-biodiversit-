@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function () {
       footprint: "Emprise",
       map_classification: "Classification",
       research_label: "Research",
-      needs_id_label: "Needs ID"
+      needs_id_label: "ID manquant"
     },
     en: {
       app_title: "INRS Biodiversity",
