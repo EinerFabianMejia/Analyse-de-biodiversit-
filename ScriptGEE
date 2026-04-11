@@ -1,0 +1,190 @@
+// ================= PARAMÈTRES =================
+
+// 1. Zone d'étude (à remplacer le nom de la variable)
+
+// 2. Training dataset (optionnel) changer le training si nécessaire à votre projet
+// var TRAINING = ee.FeatureCollection('users/TON_COMPTE/endmember');
+
+// 3. Nom du projet
+var NOM_PROJET = 'Habitats_####_';
+
+// 4. Nom du repertoire où seront enregistré les habitats
+var NOM_REPERTPORE_EXPORT = '####'
+
+
+// --- 1. Synthèse d'images pour l'été ---
+
+var ZONE = ZONE.geometry();
+
+// Obtention de l'année du traitement
+var dateAuj = ee.Date(Date.now());
+var anAuj = dateAuj.get('year').subtract(6);
+
+
+// Création des dates de début et de fin (format String pour filterDate)
+var dateDebut = ee.Date.fromYMD(anAuj, 6, 1);
+var dateFin = ee.Date.fromYMD(anAuj, 8, 31);
+
+// --- Fonction pour filtrer avec % nuages ---
+function filtreNuages(pourcentage) {
+  
+  return Sentinel2
+    .filterDate(dateDebut, dateFin) // filtre l'été
+    .filterBounds(ZONE) // bornage territoire
+    .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', pourcentage)); // Pourcentage nuages
+}
+
+// --- Essai avec 5 % ---
+var collection5 = filtreNuages(5);
+
+// Vérifie nombre d'images
+var nbImages5 = collection5.size();
+
+// --- Si 0 images → utiliser 10 % ---
+var collectionFinale = ee.ImageCollection(
+  ee.Algorithms.If(
+    nbImages5.gt(0),
+    collection5,
+    filtreNuages(10)
+  )
+);
+
+
+// Filtre images
+var image_filtre = collectionFinale  // collection d'images
+  .filterDate(dateDebut, dateFin) // filtre l'été
+  .median(); // Filtre median
+  
+  
+var image_clip = image_filtre // coupe sur la zone d'étude
+  .clip(ZONE);
+  
+Map.centerObject(image_clip,17); // zoom sur la zone d'étude
+
+// bandes des à utiliser
+var bands = ['B2','B3','B4','B5','B6','B8','B11','B12']; // Toutes les bandes à utiliser 10m et 20m
+var bands10m =  ['B2','B3','B4','B8']; // Bleu, Vert, Rouge, NIR à 10m
+var bands20m = ['B5','B6','B11','B12']; // SWIR et Red edge
+
+// ajout des bandes des 20m réchantionnées aux 10m à utiliser
+var imageRGBNI = image_filtre
+.select(bands10m)
+.addBands((image_filtre.select(bands20m)).reproject({
+    crs: image_filtre.select(bands10m).projection(),
+    scale: 10
+  }))
+.divide(10000);
+
+// --- 2. Appel de l'endmember ---
+// Chemin du fichier
+var cheminAsset = 'projects/project-id-ee-einerfabianmejia/assets/endmember';
+
+// Charger la table
+var trainingImported = ee.FeatureCollection(cheminAsset);
+
+// --- 3. Classification par Random Forest ---
+var rf = ee.Classifier.smileRandomForest(500).train({
+  features: trainingImported,
+  classProperty: 'class',
+  inputProperties: bands
+});
+
+var image_RF = imageRGBNI.classify(rf);
+  
+// --- 4. Lissage de la classification ---
+var seeds = ee.Algorithms.Image.Segmentation.seedGrid(4);
+var snic = ee.Algorithms.Image.Segmentation.SNIC({
+  image: imageRGBNI,
+  size: 4,
+  compactness: 0.6,
+  connectivity: 8,
+  neighborhoodSize: 8,
+  seeds: seeds
+});
+
+var objectClass = image_RF
+  .addBands(snic.select('clusters'))
+  .reduceConnectedComponents({
+    reducer: ee.Reducer.mode(),
+    labelBand: 'clusters'
+  });
+  
+var objectClass_clip = objectClass
+  .clip(ZONE);
+  
+// Ajout de la couche
+Map.addLayer(objectClass_clip, {min:0, max:11, palette:
+['#88d648','#bfbfbf','#de7938','#0ea300','#ffcbba','#c28097','#c1d6bb', '#3caaff', '#ffb0a0', '#95975c', '#bf62ff', '#c0c285']},
+'Classification INRS Qc ' + anAuj.getInfo());
+  
+// --- 5. Transformation en vecteurs et exportation ---
+
+// Vectorisation
+var vecteurs = objectClass_clip.reduceToVectors({
+  geometry: ZONE,
+  scale: 10,
+  geometryType: 'polygon',
+  eightConnected: true,
+  labelProperty: 'class',
+  reducer: ee.Reducer.countEvery()
+});
+
+// Simplification des géométries
+var vecteursSmooth = vecteurs.map(function(f){
+  return f.simplify(10);
+});
+
+// Dictionnaire des classes
+var nomsClasses = ee.Dictionary({
+  0: 'Gazon',
+  1: 'SurfacesImpermeables',
+  2: 'Infrastructures',
+  3: 'BoiseUrbain',
+  7: 'EauVisible',
+  8: 'SurfaceMinerales',
+  10: 'JardinAgricultureUrbaine'
+});
+
+// Regroupement des géométries
+var classes = ee.List([0,1,2,3,7,8,10]);
+
+var habitatsFusion = ee.FeatureCollection(
+  classes.map(function(c){
+
+    var subset = vecteursSmooth.filter(ee.Filter.eq('class', c));
+    
+    // vérifier si la classe contient des objets
+    var count = subset.size();
+    
+    return ee.Algorithms.If(count.gt(0),
+
+      // si la classe existe
+      (function(){
+        var geomFusion = subset.geometry().dissolve({'maxError': 1});
+        var surface = geomFusion.area({'maxError': 1});
+
+        return ee.Feature(geomFusion, {
+          'class': c,
+          'nom_classe': nomsClasses.get(c),
+          'surface_m2': surface
+        });
+      })(),
+      
+      // sinon retourner null
+      null
+    );
+
+  })
+).filter(ee.Filter.notNull(['class']));
+
+// Conversion de l'année en texte
+var anneeExport = anAuj.format();
+
+// Export shapefile
+Export.table.toDrive({
+  collection: habitatsFusion,
+  description: ee.String(NOM_PROJET).cat(anneeExport).getInfo(),
+  fileNamePrefix: ee.String(NOM_PROJET).cat(anneeExport).getInfo(),
+  folder: '####_exports',
+  fileFormat: 'SHP'
+});
