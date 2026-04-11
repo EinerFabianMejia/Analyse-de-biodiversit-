@@ -9,7 +9,7 @@
 var NOM_PROJET = 'Habitats_####_';
 
 // 4. Nom du repertoire où seront enregistré les habitats
-var NOM_REPERTPORE_EXPORT = '####'
+var NOM_REPERTPORE_EXPORT = '####_exports'
 
 
 // --- 1. Synthèse d'images pour l'été ---
@@ -185,6 +185,6 @@ Export.table.toDrive({
   collection: habitatsFusion,
   description: ee.String(NOM_PROJET).cat(anneeExport).getInfo(),
   fileNamePrefix: ee.String(NOM_PROJET).cat(anneeExport).getInfo(),
-  folder: '####_exports',
+  folder: NOM_REPERTPORE_EXPORT,
   fileFormat: 'SHP'
 });
