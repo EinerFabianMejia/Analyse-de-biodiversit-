@@ -18,7 +18,7 @@ var ZONE = ZONE.geometry();
 
 // Obtention de l'année du traitement
 var dateAuj = ee.Date(Date.now());
-var anAuj = dateAuj.get('year').subtract(6);
+var anAuj = dateAuj.get('year').subtract(0);
 
 
 // Création des dates de début et de fin (format String pour filterDate)
