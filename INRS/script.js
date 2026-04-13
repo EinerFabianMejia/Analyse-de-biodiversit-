@@ -207,14 +207,14 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   const classColorById = {
-    0: "#198f35",
-    1: "#e0c8f1",
-    2: "#929ca0",
-    3: "#4cf643",
-    8: "#0d0ced",
-    10: "#a2f2b5"
+    0: "#0aa000",
+    1: "#d9d9d9",
+    2: "#f08a3c",
+    3: "#8be85f",
+    8: "#f7b6c8",
+    10: "#d67cff"
   };
-  const fallbackPalette = ["#198f35", "#e0c8f1", "#929ca0", "#4cf643", "#0d0ced", "#a2f2b5"];
+  const fallbackPalette = ["#0aa000", "#d9d9d9", "#f08a3c", "#8be85f", "#f7b6c8", "#d67cff"];
 
   const map = L.map("map", { maxZoom: 22 }).setView(campusConfig.qc.center, campusConfig.qc.zoom);
   const baseLayers = {
