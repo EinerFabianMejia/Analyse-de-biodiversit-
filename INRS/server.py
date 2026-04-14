@@ -5,8 +5,8 @@ import urllib.request
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-HOST = "127.0.0.1"
-PORT = 8000
+HOST = "0.0.0.0"
+PORT = 8001
 GEOSERVER_BASE = "http://localhost:8080/geoserver"
 ROOT_DIR = Path(__file__).resolve().parent
 LAYER_PREFIX = {

@@ -7,7 +7,7 @@ from html import unescape
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-HOST = "127.0.0.1"
+HOST = "0.0.0.0"
 PORT = 8000
 GEOSERVER_BASE = "http://localhost:8080/geoserver"
 ROOT_DIR = Path(__file__).resolve().parent
