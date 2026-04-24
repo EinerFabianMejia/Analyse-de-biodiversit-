@@ -311,7 +311,6 @@ document.addEventListener("DOMContentLoaded", function () {
   let allObservations = [];
   let loadedIds = new Set();
   const campusBoundaries = {};
-  let currentCampusBoundary = null;
   let classAreaChart = null;
 
   window.toggleGroup = function (id) {
@@ -373,53 +372,12 @@ document.addEventListener("DOMContentLoaded", function () {
     syncLayerMenuState();
   }
 
-  function buildBoundaryClipPath(boundaryCollection) {
-    if (!boundaryCollection?.features?.length) return "";
-    let path = "";
-
-    function addRing(ring) {
-      if (!Array.isArray(ring) || !ring.length) return;
-      ring.forEach((coord, index) => {
-        const point = map.latLngToContainerPoint([coord[1], coord[0]]);
-        path += `${index === 0 ? "M" : "L"} ${point.x} ${point.y} `;
-      });
-      path += "Z ";
-    }
-
-    boundaryCollection.features.forEach((feature) => {
-      const geometry = feature?.geometry;
-      if (!geometry) return;
-      if (geometry.type === "Polygon") {
-        geometry.coordinates.forEach(addRing);
-      } else if (geometry.type === "MultiPolygon") {
-        geometry.coordinates.forEach((polygon) => polygon.forEach(addRing));
-      }
-    });
-
-    return path.trim();
-  }
-
   function applyClassificationClip() {
     if (!classifLayer) return;
     const container = classifLayer.getContainer?.();
     if (!container) return;
-
-    if (!currentCampusBoundary) {
-      container.style.clipPath = "";
-      container.style.webkitClipPath = "";
-      return;
-    }
-
-    const pathData = buildBoundaryClipPath(currentCampusBoundary);
-    if (!pathData) {
-      container.style.clipPath = "";
-      container.style.webkitClipPath = "";
-      return;
-    }
-
-    const clipValue = `path('${pathData}')`;
-    container.style.clipPath = clipValue;
-    container.style.webkitClipPath = clipValue;
+    container.style.clipPath = "";
+    container.style.webkitClipPath = "";
   }
 
   function setBaseLayer(layerKey) {
@@ -751,8 +709,6 @@ document.addEventListener("DOMContentLoaded", function () {
       format: "image/png",
       transparent: true
     });
-    layer.on("load", applyClassificationClip);
-    layer.on("add", applyClassificationClip);
     return layer;
   }
 
@@ -1336,7 +1292,6 @@ document.addEventListener("DOMContentLoaded", function () {
     currentCampus = name;
     const campus = campusConfig[name];
     const boundaryCollection = await getCampusBoundary(name);
-    currentCampusBoundary = boundaryCollection;
     fitCampusBoundary(boundaryCollection, campus.center, campus.zoom);
 
     if (campusMarker) {
