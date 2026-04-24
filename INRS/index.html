@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Biodiversite INRS</title>
+<title>Biodiversité INRS</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
@@ -15,7 +15,7 @@
 <div id="sidebar">
   <div class="logo">
     <img src="INRS.jpeg" alt="Logo INRS">
-    <h2 data-i18n="app_title">Biodiversite INRS</h2>
+    <h2 data-i18n="app_title">Biodiversité INRS</h2>
     <p data-i18n="app_subtitle">Deux campus, une interface claire pour suivre les habitats et les observations.</p>
   </div>
 
@@ -39,7 +39,7 @@
 
   <div id="campusList" class="sub-list">
     <button class="campus-btn" onclick="loadCampus('qc')">
-      <span class="campus-name" data-i18n="campus_qc">INRS Quebec</span>
+      <span class="campus-name" data-i18n="campus_qc">INRS Québec</span>
       <span class="campus-address" data-i18n="campus_qc_address">2605 Bd du Parc-Technologique</span>
     </button>
     <button class="campus-btn" onclick="loadCampus('laval')">
@@ -63,14 +63,14 @@
   <div id="timeControl" class="sub-list">
     <div class="time-card">
       <div class="time-card-header">
-        <span class="time-card-label" data-i18n="active_year">Annee active</span>
+        <span class="time-card-label" data-i18n="active_year">Année active</span>
         <span id="yearLabel" class="time-year-pill">--</span>
       </div>
       <input type="range" id="yearSlider" min="2020" max="2025" step="1" value="2025">
       <div class="time-actions">
         <button class="time-btn chart-btn" onclick="openClassChart()" data-i18n="surface_chart">Graphique superficies</button>
         <button class="time-btn export-btn" onclick="exportMapImage()" data-i18n="export_png">Exporter carte PNG</button>
-        <button class="time-btn report-btn" onclick="generateMonthlyReport()" data-i18n="monthly_report">Generer rapport mensuel</button>
+        <button class="time-btn report-btn" onclick="generateMonthlyReport()" data-i18n="monthly_report">Générer rapport mensuel</button>
       </div>
     </div>
   </div>
@@ -91,6 +91,9 @@
     <label><input type="checkbox" class="obsType" value="Mollusques"> <span data-group-label="Mollusques">Mollusques</span></label>
     <label><input type="checkbox" class="obsType" value="Plantes"> <span data-group-label="Plantes">Plantes</span></label>
     <label><input type="checkbox" class="obsType" value="Champignons"> <span data-group-label="Champignons">Champignons</span></label>
+    <label><input type="checkbox" class="obsType" value="Protozoaires"> <span data-group-label="Protozoaires">Protozoaires</span></label>
+    <label><input type="checkbox" class="obsType" value="Chromistes"> <span data-group-label="Chromistes">Chromistes</span></label>
+    <label><input type="checkbox" class="obsType" value="AutresAnimaux"> <span data-group-label="AutresAnimaux">Autres animaux</span></label>
     <button onclick="loadAllProjectObservations()">
       <i class="fa-solid fa-globe"></i>
       <span data-i18n="load_observations">Charger observations</span>
@@ -100,21 +103,79 @@
       <span data-i18n="remove_observations">Retirer observations</span>
     </button>
   </div>
+
+  <div class="menu-item" onclick="toggleGroup('dataSourceList')">
+    <i class="fa-solid fa-database"></i>
+    <span data-i18n="data_sources">Source des données</span>
+  </div>
+
+  <div id="dataSourceList" class="sub-list"></div>
 </div>
 
 <div id="map"></div>
-<div id="infoPanel" data-i18n="select_campus_hint">Selectionnez un campus pour afficher la classification et les observations.</div>
+<div id="mapLayerMenu" class="map-layer-menu">
+  <button id="mapLayerToggle" class="map-layer-toggle" type="button" aria-label="Choisir les couches">
+    <i class="fa-solid fa-layer-group"></i>
+  </button>
+  <div id="mapLayerPanel" class="map-layer-panel">
+    <div class="map-layer-section">
+      <label class="map-layer-option">
+        <input type="radio" name="inrsBaseLayer" value="carte" checked>
+        <span data-i18n="base_map">Carte</span>
+      </label>
+      <label class="map-layer-option">
+        <input type="radio" name="inrsBaseLayer" value="street">
+        <span data-i18n="street_map">Street View</span>
+      </label>
+      <label class="map-layer-option">
+        <input type="radio" name="inrsBaseLayer" value="satellite">
+        <span data-i18n="satellite_map">Satellite</span>
+      </label>
+      <label class="map-layer-option">
+        <input type="radio" name="inrsBaseLayer" value="topo">
+        <span data-i18n="topo_map">Topo</span>
+      </label>
+    </div>
+    <div class="map-layer-section">
+      <label class="map-layer-option">
+        <input type="checkbox" id="toggleFootprint" checked>
+        <span data-i18n="footprint">Emprise</span>
+      </label>
+      <label class="map-layer-option">
+        <input type="checkbox" id="toggleClassification" checked>
+        <span data-i18n="map_classification">Classification</span>
+      </label>
+    </div>
+  </div>
+</div>
+<div id="infoPanel" data-i18n="select_campus_hint">Sélectionnez un campus pour afficher la classification et les observations.</div>
 
 <div id="classLegendPanel" class="map-legend">
-  <div class="legend-title" data-i18n="class_legend">Legende des classes</div>
-  <div id="classLegendContent" data-i18n="loading_legend">Chargement de la legende...</div>
+  <div class="legend-title" data-i18n="class_legend">Légende des classes</div>
+  <div id="classLegendContent" data-i18n="loading_legend">Chargement de la légende...</div>
+</div>
+
+<div id="airQualityLegendPanel" class="air-quality-legend-panel">
+  <div class="air-quality-legend-title" data-i18n="air_quality_legend_title">Qualité de l'air</div>
+  <div class="air-quality-legend-row">
+    <span class="air-quality-legend-dot" style="background:#22c55e"></span>
+    <span><strong data-i18n="air_category_good">Bon</strong> <span data-i18n="air_range_good">(de 1 à 25)</span></span>
+  </div>
+  <div class="air-quality-legend-row">
+    <span class="air-quality-legend-dot" style="background:#facc15"></span>
+    <span><strong data-i18n="air_category_acceptable">Acceptable</strong> <span data-i18n="air_range_acceptable">(de 26 à 50)</span></span>
+  </div>
+  <div class="air-quality-legend-row">
+    <span class="air-quality-legend-dot" style="background:#ef4444"></span>
+    <span><strong data-i18n="air_category_poor">Mauvais</strong> <span data-i18n="air_range_poor">(51 et plus)</span></span>
+  </div>
 </div>
 
 <div id="chartModal" class="chart-modal">
   <div class="chart-modal-card">
     <div class="chart-modal-header">
       <div>
-        <div class="chart-modal-title" data-i18n="surface_chart">Evolution des superficies</div>
+        <div class="chart-modal-title" data-i18n="surface_chart">Évolution des superficies</div>
         <div id="chartModalSubtitle" class="chart-modal-subtitle" data-i18n="loading">Chargement...</div>
       </div>
       <button class="chart-close" onclick="closeClassChart()" data-i18n="close">Fermer</button>

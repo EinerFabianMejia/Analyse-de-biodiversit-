@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const classLegendContent = document.getElementById("classLegendContent");
   const infoPanel = document.getElementById("infoPanel");
   const classLegendPanel = document.getElementById("classLegendPanel");
+  const dataSourceListEl = document.getElementById("dataSourceList");
   const addressSearch = document.getElementById("addressSearch");
   const languageSelect = document.getElementById("languageSelect");
   const searchSuggestions = document.getElementById("searchSuggestions");
@@ -82,84 +83,92 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const translations = {
     fr: {
-      app_title: "Biodiversite",
+      app_title: "Biodiversité",
       language: "Langue",
       home: "Accueil",
       classification: "Classification",
       loading_classes: "Chargement des classes...",
       temporal_tracking: "Suivi temporel",
-      active_year: "Annee active",
+      active_year: "Année active",
       surface_chart: "Graphique superficies",
       export_png: "Exporter carte PNG",
-      monthly_report: "Generer rapport mensuel",
+      monthly_report: "Générer rapport mensuel",
       observations: "Observations",
-      load_all_species: "Charger toutes especes",
+      load_all_species: "Charger toutes espèces",
       remove_observations: "Retirer observations",
-      air_quality: "Qualite de l'air",
-      loading_air_quality: "Chargement de la qualite de l'air...",
+      air_quality: "Qualité de l'air",
+      loading_air_quality: "Chargement de la qualité de l'air...",
+      data_sources: "Source des données",
+      data_sources_satellite_tag: "Images satellites",
+      data_sources_satellite_title: "Sentinel-2",
+      data_sources_satellite_text: "Les images satellites utilisées pour la classification proviennent de Sentinel-2. Seules les images de la période estivale ont été retenues puis fusionnées afin d'améliorer l'analyse. La classification a ensuite été produite à l'aide d'un algorithme dans Google Earth Engine.",
+      data_sources_observation_tag: "Observations citoyennes",
+      data_sources_observation_title: "iNaturalist",
+      data_sources_observation_text: "Le Réseau biodiversité au campus a permis la création du polygone et la consolidation des données sur la plateforme iNaturalist. Partagez vos observations vous aussi!",
+      data_sources_visit_project: "Cliquer sur l'image pour ouvrir le projet iNaturalist",
       air_quality_source: "Source gouvernementale",
-      air_quality_refresh: "Mise a jour",
+      air_quality_refresh: "Mise à jour",
       air_quality_campus_estimate: "Estimation campus",
       air_quality_stations: "Stations officielles",
-      air_quality_interpolation_note: "Interpolation IDW a partir des stations officielles du gouvernement du Quebec autour du campus.",
-      air_quality_unavailable: "Impossible de charger la qualite de l'air.",
-      air_quality_live_note: "Seules les stations avec une valeur IQA en direct sont utilisees dans l'interpolation.",
+      air_quality_interpolation_note: "Interpolation IDW à partir des stations officielles du gouvernement du Québec autour du campus.",
+      air_quality_unavailable: "Impossible de charger la qualité de l'air.",
+      air_quality_live_note: "Seules les stations avec une valeur IQA en direct sont utilisées dans l'interpolation.",
       air_quality_overlay_on: "Couche air visible",
-      air_quality_overlay_off: "Couche air masquee",
+      air_quality_overlay_off: "Couche air masquée",
       station: "Station",
       pollutant: "Polluant",
       live_value_missing: "Valeur IQA en direct non disponible",
       air_index: "Indice IQA",
       components: "Composantes",
       search_address: "Chercher adresse",
-      select_class_hint: "Selectionnez une classe pour voir la superficie",
-      class_legend: "Legende des classes",
-      loading_legend: "Chargement de la legende...",
-      surface_evolution: "Evolution des superficies",
+      select_class_hint: "Sélectionnez une classe pour voir la superficie",
+      class_legend: "Légende des classes",
+      loading_legend: "Chargement de la légende...",
+      surface_evolution: "Évolution des superficies",
       loading: "Chargement...",
       close: "Fermer",
       no_classes: "Aucune classe disponible.",
-      no_legend: "Aucune legende disponible.",
-      loading_observations: "Telechargement des observations...",
-      observations_removed: "Observations retirees de la carte.",
-      year: "Annee",
+      no_legend: "Aucune légende disponible.",
+      loading_observations: "Téléchargement des observations...",
+      observations_removed: "Observations retirées de la carte.",
+      year: "Année",
       statistics: "Statistiques",
       total_observations: "observations",
-      realtime_observations: "Observations iNaturalist temps reel",
-      classification_year: "Annee classification",
-      search_no_result: "Aucune suggestion trouvee.",
-      result: "Resultat",
+      realtime_observations: "Observations iNaturalist temps réel",
+      classification_year: "Année classification",
+      search_no_result: "Aucune suggestion trouvée.",
+      result: "Résultat",
       address: "Adresse",
       loading_chart: "Chargement du graphique...",
       chart_unavailable: "Impossible de charger le graphique.",
-      chart_surface_subtitle: "Evolution des superficies par classe",
+      chart_surface_subtitle: "Évolution des superficies par classe",
       area_ha: "Superficie (ha)",
       class_label: "Classe",
       area_label: "Superficie",
       unknown: "Inconnue",
       type: "Type",
-      quality: "Qualite",
+      quality: "Qualité",
       date: "Date",
-      french_name: "Nom francais",
+      french_name: "Nom français",
       view_source: "Voir l'observation source",
-      report_title: "Rapport mensuel biodiversite",
+      report_title: "Rapport mensuel biodiversité",
       month: "Mois",
       observation_types: "Types d'observations affiches",
-      observation_srs: "Systeme de reference des observations",
-      classification_srs: "Systeme de reference de la classification carte",
+      observation_srs: "Système de référence des observations",
+      classification_srs: "Système de référence de la classification carte",
       observation_stats: "Statistiques observations",
       total: "Total",
-      summary: "Resume",
-      report_summary_text: "Ce rapport resume l'etat courant des observations iNaturalist filtrees en Research et Needs ID, ainsi que la superficie des classes de la couche ULaval pour {year}.",
-      scale: "Echelle",
-      scale_unavailable: "Echelle non disponible",
-      exported_on: "Exporte le",
-      biodiversity_map_title: "Carte de biodiversite ULaval",
+      summary: "Résumé",
+      report_summary_text: "Ce rapport résume l'état courant des observations iNaturalist filtrées en Research et Needs ID, ainsi que la superficie des classes de la couche ULaval pour {year}.",
+      scale: "Échelle",
+      scale_unavailable: "Échelle non disponible",
+      exported_on: "Exporté le",
+      biodiversity_map_title: "Carte de biodiversité ULaval",
       classification_observations: "Classification {year} | Observations iNaturalist",
-      platform_footer: "Plateforme biodiversite campus ULaval",
+      platform_footer: "Plateforme biodiversité campus ULaval",
       source_footer: "Source : GeoServer + iNaturalist",
       base_map: "Carte",
-      street_map: "Street",
+      street_map: "Street View",
       satellite_map: "Satellite",
       topo_map: "Topo",
       footprint: "Emprise",
@@ -172,7 +181,11 @@ document.addEventListener("DOMContentLoaded", function () {
       observation_default_name: "Observation",
       air_category_good: "Bon",
       air_category_acceptable: "Acceptable",
-      air_category_poor: "Mauvais"
+      air_category_poor: "Mauvais",
+      air_quality_legend_title: "Qualité de l'air",
+      air_range_good: "(de 1 à 25)",
+      air_range_acceptable: "(de 26 à 50)",
+      air_range_poor: "(51 et plus)"
     },
     en: {
       app_title: "Biodiversity",
@@ -190,6 +203,14 @@ document.addEventListener("DOMContentLoaded", function () {
       remove_observations: "Remove observations",
       air_quality: "Air quality",
       loading_air_quality: "Loading air quality...",
+      data_sources: "Data sources",
+      data_sources_satellite_tag: "Satellite imagery",
+      data_sources_satellite_title: "Sentinel-2",
+      data_sources_satellite_text: "The satellite imagery used for classification comes from Sentinel-2. Only summer-period images were selected and merged to support the analysis. The classification was then produced using an algorithm in Google Earth Engine.",
+      data_sources_observation_tag: "Citizen observations",
+      data_sources_observation_title: "iNaturalist - Campus biodiversity network",
+      data_sources_observation_text: "The Campus Biodiversity Network supported the creation of the polygon and the consolidation of data on the iNaturalist platform. Share your observations too!",
+      data_sources_visit_project: "Click the image to open the iNaturalist project",
       air_quality_source: "Government source",
       air_quality_refresh: "Updated",
       air_quality_campus_estimate: "Campus estimate",
@@ -252,7 +273,7 @@ document.addEventListener("DOMContentLoaded", function () {
       platform_footer: "ULaval campus biodiversity platform",
       source_footer: "Source: GeoServer + iNaturalist",
       base_map: "Map",
-      street_map: "Street",
+      street_map: "Street View",
       satellite_map: "Satellite",
       topo_map: "Topo",
       footprint: "Campus boundary",
@@ -265,21 +286,35 @@ document.addEventListener("DOMContentLoaded", function () {
       observation_default_name: "Observation",
       air_category_good: "Good",
       air_category_acceptable: "Acceptable",
-      air_category_poor: "Poor"
+      air_category_poor: "Poor",
+      air_quality_legend_title: "Air quality",
+      air_range_good: "(1 to 25)",
+      air_range_acceptable: "(26 to 50)",
+      air_range_poor: "(51 and over)"
     }
   };
 
   const classNameTranslations = {
     Gazon: { fr: "Gazon", en: "Lawn" },
-    SurfacesImpermeables: { fr: "SurfacesImpermeables", en: "ImperviousSurfaces" },
+    SurfacesImpermeables: { fr: "Surfaces imperméables", en: "Impervious surfaces" },
     Infrastructures: { fr: "Infrastructures", en: "Infrastructure" },
-    BoiseUrbain: { fr: "BoiseUrbain", en: "UrbanWoodland" },
-    SurfaceMinerales: { fr: "SurfaceMinerales", en: "MineralSurfaces" },
-    JardinAgricultureUrbaine: { fr: "JardinAgricultureUrbaine", en: "UrbanAgricultureGarden" }
+    BoiseUrbain: { fr: "Boisé urbain", en: "Urban woodland" },
+    SurfaceMinerales: { fr: "Surfaces perméables", en: "Permeable surfaces" },
+    SurfacesPermeables: { fr: "Surfaces perméables", en: "Permeable surfaces" },
+    JardinAgricultureUrbaine: { fr: "Jardin et agriculture urbaine", en: "Garden and urban agriculture" }
+  };
+
+  const classNameById = {
+    0: "Gazon",
+    1: "SurfacesImpermeables",
+    2: "Infrastructures",
+    3: "BoiseUrbain",
+    8: "SurfaceMinerales",
+    10: "JardinAgricultureUrbaine"
   };
 
   const groupLabels = {
-    Mammiferes: { fr: "Mammiferes", en: "Mammals" },
+    Mammiferes: { fr: "Mammifères", en: "Mammals" },
     Oiseaux: { fr: "Oiseaux", en: "Birds" },
     Reptiles: { fr: "Reptiles", en: "Reptiles" },
     Amphibiens: { fr: "Amphibiens", en: "Amphibians" },
@@ -371,6 +406,61 @@ document.addEventListener("DOMContentLoaded", function () {
       node.textContent = translateGroupName(node.dataset.groupLabel);
     });
     if (languageSelect) languageSelect.value = currentLanguage;
+    renderDataSourcesPanel();
+  }
+
+  function renderDataSourcesPanel() {
+    if (!dataSourceListEl) return;
+    dataSourceListEl.innerHTML = `
+      <div class="data-source-card">
+        <div class="data-source-block">
+          <div class="data-source-kicker">
+            <i class="fa-solid fa-satellite"></i>
+            <span>${escapeHtml(t("data_sources_satellite_tag"))}</span>
+          </div>
+          <div class="data-source-title-row">
+            <h3 class="data-source-title">${escapeHtml(t("data_sources_satellite_title"))}</h3>
+            <button type="button" class="data-source-info-btn" data-info-toggle aria-label="Afficher info">i</button>
+          </div>
+          <p class="data-source-text">${escapeHtml(t("data_sources_satellite_text"))}</p>
+        </div>
+        <div class="data-source-block">
+          <div class="data-source-kicker">
+            <i class="fa-solid fa-seedling"></i>
+            <span>${escapeHtml(t("data_sources_observation_tag"))}</span>
+          </div>
+          <div class="data-source-title-row">
+            <h3 class="data-source-title">${escapeHtml(t("data_sources_observation_title"))}</h3>
+            <button type="button" class="data-source-info-btn" data-info-toggle aria-label="Afficher info">i</button>
+          </div>
+          <p class="data-source-text">${escapeHtml(t("data_sources_observation_text"))}</p>
+          <a class="data-source-link" href="https://www.inaturalist.ca/projects/universite-laval-reseau-biodiversite-au-campus" target="_blank" rel="noreferrer">
+            <img class="data-source-image" src="NPU_ULAVAL.png" alt="Reseau biodiversite au campus">
+            <div class="data-source-link-note">${escapeHtml(t("data_sources_visit_project"))}</div>
+          </a>
+        </div>
+      </div>
+    `;
+    attachDataSourceInfoToggles(dataSourceListEl);
+  }
+
+  function attachDataSourceInfoToggles(container) {
+    container.querySelectorAll("[data-info-toggle]").forEach((button) => {
+      button.addEventListener("click", function (event) {
+        event.stopPropagation();
+        const currentBlock = this.closest(".data-source-block");
+        if (!currentBlock) return;
+        const shouldOpen = !currentBlock.classList.contains("is-open");
+        container.querySelectorAll(".data-source-block").forEach((block) => block.classList.remove("is-open"));
+        if (shouldOpen) currentBlock.classList.add("is-open");
+      });
+    });
+
+    container.querySelectorAll(".data-source-block").forEach((block) => {
+      block.addEventListener("mouseleave", function () {
+        this.classList.remove("is-open");
+      });
+    });
   }
 
   function formatArea(surfaceM2) {
@@ -493,6 +583,21 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
         <div class="air-quality-note">${escapeHtml(t("air_quality_interpolation_note"))}</div>
         <div class="air-quality-note">${escapeHtml(t("air_quality_live_note"))}</div>
+        <div class="air-quality-inline-legend">
+          <div class="air-quality-inline-title">${escapeHtml(t("air_quality_legend_title"))}</div>
+          <div class="air-quality-inline-row">
+            <span class="air-quality-inline-dot" style="background:#22c55e"></span>
+            <span><strong>${escapeHtml(t("air_category_good"))}</strong> ${escapeHtml(t("air_range_good"))}</span>
+          </div>
+          <div class="air-quality-inline-row">
+            <span class="air-quality-inline-dot" style="background:#facc15"></span>
+            <span><strong>${escapeHtml(t("air_category_acceptable"))}</strong> ${escapeHtml(t("air_range_acceptable"))}</span>
+          </div>
+          <div class="air-quality-inline-row">
+            <span class="air-quality-inline-dot" style="background:#ef4444"></span>
+            <span><strong>${escapeHtml(t("air_category_poor"))}</strong> ${escapeHtml(t("air_range_poor"))}</span>
+          </div>
+        </div>
         <div class="air-station-title">${escapeHtml(t("air_quality_stations"))}</div>
         <div class="air-station-list">
           ${airQualityData.map((station) => `
@@ -661,7 +766,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const surfaceM2 = Number(entry.surface_m2 ?? 0);
     return {
       id: safeId,
-      name: entry.name || entry.nom_classe || `Classe ${safeId}`,
+      name: entry.name || entry.nom_classe || classNameById[safeId] || `Classe ${safeId}`,
       color: entry.color || classColorById[safeId] || fallbackPalette[index % fallbackPalette.length],
       surface_m2: Number.isNaN(surfaceM2) ? 0 : surfaceM2
     };
@@ -740,7 +845,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!classMetadata.length) throw new Error("Aucune classe recuperee");
     } catch (error) {
       console.error("Erreur chargement des classes:", error);
-      classMetadata = defaultClassIds.map((id, index) => normalizeClassEntry({ id, name: `Classe ${id}` }, index));
+      classMetadata = defaultClassIds.map((id, index) => normalizeClassEntry({ id, name: classNameById[id] || `Classe ${id}` }, index));
     }
 
     renderClassFilters();

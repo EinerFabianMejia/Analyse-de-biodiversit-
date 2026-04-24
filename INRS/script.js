@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const campusConfig = {
     qc: {
       key: "qc",
-      label: { fr: "INRS Quebec", en: "INRS Quebec" },
+      label: { fr: "INRS Québec", en: "INRS Quebec" },
       center: [46.79643680007479, -71.30277395255203],
       zoom: 17,
       secteur: "ne:INRS_emprise_Qc",
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
       label: { fr: "INRS Laval", en: "INRS Laval" },
       center: [45.54543960384367, -73.7202473476199],
       zoom: 17,
-      secteur: "ne:INRS_emprise_Laval",
+      secteur: "ne:Limite_INRS_Laval",
       layerPrefix: "Habitats_INRS_Laval_",
       inaturalist: {
         projectId: "inrs-reseau-biodiversite-sur-le-campus",
@@ -38,75 +38,90 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const translations = {
     fr: {
-      app_title: "Biodiversite INRS",
+      app_title: "Biodiversité INRS",
       app_subtitle: "Deux campus, une interface claire pour suivre les habitats et les observations.",
       language: "Langue",
       home: "Accueil",
       campus_menu: "Campus INRS",
-      campus_qc: "INRS Quebec",
+      campus_qc: "INRS Québec",
       campus_qc_address: "2605 Bd du Parc-Technologique",
       campus_laval: "INRS Laval",
       campus_laval_address: "531 Boul. des Prairies",
       habitat_classification: "Classification habitat",
       loading_classes: "Chargement des classes...",
       temporal_tracking: "Suivi temporel",
-      active_year: "Annee active",
+      active_year: "Année active",
       surface_chart: "Graphique superficies",
       export_png: "Exporter carte PNG",
-      monthly_report: "Generer rapport mensuel",
+      monthly_report: "Générer rapport mensuel",
       observations: "Observations iNaturalist",
       load_observations: "Charger observations",
       remove_observations: "Retirer observations",
-      select_campus_hint: "Selectionnez un campus pour afficher la classification et les observations.",
-      class_legend: "Legende des classes",
-      loading_legend: "Chargement de la legende...",
+      data_sources: "Source des données",
+      data_sources_satellite_tag: "Images satellites",
+      data_sources_satellite_title: "Sentinel-2",
+      data_sources_satellite_text: "Les images satellites utilisées pour la classification proviennent de Sentinel-2. Seules les images de la période estivale ont été retenues puis fusionnées afin d'améliorer l'analyse. La classification a ensuite été produite à l'aide d'un algorithme dans Google Earth Engine.",
+      data_sources_observation_tag: "Observations citoyennes",
+      data_sources_observation_title: "iNaturalist",
+      data_sources_observation_text: "Le Réseau biodiversité au campus a permis la création du polygone et la consolidation des données sur la plateforme iNaturalist. Partagez vos observations vous aussi!",
+      data_sources_visit_project: "Cliquer sur l'image pour ouvrir le projet iNaturalist",
+      select_campus_hint: "Sélectionnez un campus pour afficher la classification et les observations.",
+      class_legend: "Légende des classes",
+      loading_legend: "Chargement de la légende...",
       loading: "Chargement...",
       close: "Fermer",
-      no_legend: "Aucune legende disponible.",
+      no_legend: "Aucune légende disponible.",
       no_classes: "Aucune classe disponible.",
-      realtime_observations: "Observations iNaturalist temps reel",
+      realtime_observations: "Observations iNaturalist temps réel",
       campus: "Campus",
-      classification_year: "Annee classification",
+      classification_year: "Année classification",
       statistics: "Statistiques",
-      observations_removed: "Observations retirees de la carte.",
-      french_name: "Nom francais",
+      observations_removed: "Observations retirées de la carte.",
+      french_name: "Nom français",
       type: "Type",
-      quality: "Qualite",
+      quality: "Qualité",
       date: "Date",
       unknown: "Inconnue",
       source_link: "Voir l'observation source",
       export_error: "Impossible d'exporter l'image de la carte.",
-      export_title: "Carte de biodiversite INRS",
+      export_title: "Carte de biodiversité INRS",
       export_subtitle: "{campus} | Classification {year} | Observations iNaturalist",
-      exported_on: "Exporte le",
-      scale: "Echelle",
-      scale_unavailable: "Echelle non disponible",
-      platform_footer: "Plateforme biodiversite campus INRS",
+      exported_on: "Exporté le",
+      scale: "Échelle",
+      scale_unavailable: "Échelle non disponible",
+      platform_footer: "Plateforme biodiversité campus INRS",
       source_footer: "Source : GeoServer + iNaturalist",
-      report_title: "Rapport mensuel biodiversite INRS",
+      report_title: "Rapport mensuel biodiversité INRS",
       month: "Mois",
-      observation_types: "Types d'observations affiches",
-      observation_srs: "Systeme de reference des observations",
-      classification_srs: "Systeme de reference de la classification carte",
+      observation_types: "Types d'observations affichés",
+      observation_srs: "Système de référence des observations",
+      classification_srs: "Système de référence de la classification carte",
       observation_stats: "Statistiques observations",
       total: "Total",
       class_label: "Classe",
       area_label: "Superficie",
-      summary: "Resume",
-      report_summary_text: "Ce rapport resume l'etat courant des observations iNaturalist filtrees en Research et Needs ID, ainsi que la superficie des classes de la classification pour {campus} en {year}.",
+      summary: "Résumé",
+      report_summary_text: "Ce rapport résume l'état courant des observations iNaturalist filtrées en Research et Needs ID, ainsi que la superficie des classes de la classification pour {campus} en {year}.",
       chart_loading: "Chargement du graphique...",
       chart_error: "Impossible de charger le graphique.",
-      chart_subtitle: "{campus} - evolution des superficies par classe",
+      chart_subtitle: "{campus} - évolution des superficies par classe",
       area_axis: "Superficie (ha)",
-      year_axis: "Annee",
+      year_axis: "Année",
       base_map: "Carte",
-      street_map: "Street",
+      street_map: "Street View",
       satellite_map: "Satellite",
       topo_map: "Topo",
       footprint: "Emprise",
       map_classification: "Classification",
       research_label: "Research",
-      needs_id_label: "ID manquant"
+      needs_id_label: "ID manquant",
+      air_quality_legend_title: "Qualité de l'air",
+      air_category_good: "Bon",
+      air_category_acceptable: "Acceptable",
+      air_category_poor: "Mauvais",
+      air_range_good: "(de 1 à 25)",
+      air_range_acceptable: "(de 26 à 50)",
+      air_range_poor: "(51 et plus)"
     },
     en: {
       app_title: "INRS Biodiversity",
@@ -128,6 +143,14 @@ document.addEventListener("DOMContentLoaded", function () {
       observations: "iNaturalist observations",
       load_observations: "Load observations",
       remove_observations: "Remove observations",
+      data_sources: "Data sources",
+      data_sources_satellite_tag: "Satellite imagery",
+      data_sources_satellite_title: "Sentinel-2",
+      data_sources_satellite_text: "The satellite imagery used for classification comes from Sentinel-2. Only summer-period images were selected and merged to support the analysis. The classification was then produced using an algorithm in Google Earth Engine.",
+      data_sources_observation_tag: "Citizen observations",
+      data_sources_observation_title: "iNaturalist - Campus biodiversity network",
+      data_sources_observation_text: "The Campus Biodiversity Network supported the creation of the polygon and the consolidation of data on the iNaturalist platform. Share your observations too!",
+      data_sources_visit_project: "Click the image to open the iNaturalist project",
       select_campus_hint: "Select a campus to display classification and observations.",
       class_legend: "Class legend",
       loading_legend: "Loading legend...",
@@ -171,27 +194,44 @@ document.addEventListener("DOMContentLoaded", function () {
       area_axis: "Area (ha)",
       year_axis: "Year",
       base_map: "Map",
-      street_map: "Street",
+      street_map: "Street View",
       satellite_map: "Satellite",
       topo_map: "Topo",
       footprint: "Footprint",
       map_classification: "Classification",
       research_label: "Research",
-      needs_id_label: "Needs ID"
+      needs_id_label: "Needs ID",
+      air_quality_legend_title: "Air quality",
+      air_category_good: "Good",
+      air_category_acceptable: "Acceptable",
+      air_category_poor: "Poor",
+      air_range_good: "(1 to 25)",
+      air_range_acceptable: "(26 to 50)",
+      air_range_poor: "(51 and over)"
     }
   };
 
   const classNameTranslations = {
     Gazon: { fr: "Gazon", en: "Lawn" },
-    SurfacesImpermeables: { fr: "SurfacesImpermeables", en: "ImperviousSurfaces" },
+    SurfacesImpermeables: { fr: "Surfaces imperméables", en: "Impervious surfaces" },
     Infrastructures: { fr: "Infrastructures", en: "Infrastructure" },
-    BoiseUrbain: { fr: "BoiseUrbain", en: "UrbanWoodland" },
-    SurfaceMinerales: { fr: "SurfaceMinerales", en: "MineralSurfaces" },
-    JardinAgricultureUrbaine: { fr: "JardinAgricultureUrbaine", en: "UrbanAgricultureGarden" }
+    BoiseUrbain: { fr: "Boisé urbain", en: "Urban woodland" },
+    SurfaceMinerales: { fr: "Surfaces perméables", en: "Permeable surfaces" },
+    SurfacesPermeables: { fr: "Surfaces perméables", en: "Permeable surfaces" },
+    JardinAgricultureUrbaine: { fr: "Jardin et agriculture urbaine", en: "Garden and urban agriculture" }
+  };
+
+  const classNameById = {
+    0: "Gazon",
+    1: "SurfacesImpermeables",
+    2: "Infrastructures",
+    3: "BoiseUrbain",
+    8: "SurfaceMinerales",
+    10: "JardinAgricultureUrbaine"
   };
 
   const groupLabels = {
-    Mammiferes: { fr: "Mammiferes", en: "Mammals" },
+    Mammiferes: { fr: "Mammifères", en: "Mammals" },
     Oiseaux: { fr: "Oiseaux", en: "Birds" },
     Reptiles: { fr: "Reptiles", en: "Reptiles" },
     Amphibiens: { fr: "Amphibiens", en: "Amphibians" },
@@ -216,7 +256,7 @@ document.addEventListener("DOMContentLoaded", function () {
   };
   const fallbackPalette = ["#0aa000", "#d9d9d9", "#f08a3c", "#8be85f", "#f7b6c8", "#d67cff"];
 
-  const map = L.map("map", { maxZoom: 22 }).setView(campusConfig.qc.center, campusConfig.qc.zoom);
+  const map = L.map("map", { maxZoom: 22 }).setView(campusConfig.laval.center, campusConfig.laval.zoom);
   const baseLayers = {
     Carte: L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
       attribution: "&copy; OpenStreetMap &copy; CARTO"
@@ -251,13 +291,17 @@ document.addEventListener("DOMContentLoaded", function () {
   const classLegendContent = document.getElementById("classLegendContent");
   const classLegendPanel = document.getElementById("classLegendPanel");
   const infoPanel = document.getElementById("infoPanel");
+  const dataSourceListEl = document.getElementById("dataSourceList");
   const languageSelect = document.getElementById("languageSelect");
+  const mapLayerMenu = document.getElementById("mapLayerMenu");
+  const mapLayerToggle = document.getElementById("mapLayerToggle");
   const chartModal = document.getElementById("chartModal");
   const chartModalSubtitle = document.getElementById("chartModalSubtitle");
   const classAreaCanvas = document.getElementById("classAreaChart");
 
   let currentCampus = "qc";
   let currentYear = Number(slider.value);
+  let currentBaseLayerKey = "carte";
   let classifLayer = null;
   let secteurLayer = null;
   let campusMarker = null;
@@ -267,6 +311,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let allObservations = [];
   let loadedIds = new Set();
   const campusBoundaries = {};
+  let currentCampusBoundary = null;
   let classAreaChart = null;
 
   window.toggleGroup = function (id) {
@@ -321,10 +366,99 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function refreshLayerControl() {
-    if (layerControl) map.removeControl(layerControl);
-    layerControl = L.control.layers(getLocalizedBaseLayers(), getLocalizedOverlayLayers(), {
-      collapsed: true
-    }).addTo(map);
+    if (layerControl) {
+      map.removeControl(layerControl);
+      layerControl = null;
+    }
+    syncLayerMenuState();
+  }
+
+  function buildBoundaryClipPath(boundaryCollection) {
+    if (!boundaryCollection?.features?.length) return "";
+    let path = "";
+
+    function addRing(ring) {
+      if (!Array.isArray(ring) || !ring.length) return;
+      ring.forEach((coord, index) => {
+        const point = map.latLngToContainerPoint([coord[1], coord[0]]);
+        path += `${index === 0 ? "M" : "L"} ${point.x} ${point.y} `;
+      });
+      path += "Z ";
+    }
+
+    boundaryCollection.features.forEach((feature) => {
+      const geometry = feature?.geometry;
+      if (!geometry) return;
+      if (geometry.type === "Polygon") {
+        geometry.coordinates.forEach(addRing);
+      } else if (geometry.type === "MultiPolygon") {
+        geometry.coordinates.forEach((polygon) => polygon.forEach(addRing));
+      }
+    });
+
+    return path.trim();
+  }
+
+  function applyClassificationClip() {
+    if (!classifLayer) return;
+    const container = classifLayer.getContainer?.();
+    if (!container) return;
+
+    if (!currentCampusBoundary) {
+      container.style.clipPath = "";
+      container.style.webkitClipPath = "";
+      return;
+    }
+
+    const pathData = buildBoundaryClipPath(currentCampusBoundary);
+    if (!pathData) {
+      container.style.clipPath = "";
+      container.style.webkitClipPath = "";
+      return;
+    }
+
+    const clipValue = `path('${pathData}')`;
+    container.style.clipPath = clipValue;
+    container.style.webkitClipPath = clipValue;
+  }
+
+  function setBaseLayer(layerKey) {
+    if (!baseLayerRefs[layerKey]) return;
+    Object.entries(baseLayerRefs).forEach(([key, layer]) => {
+      if (!layer) return;
+      if (key === layerKey) {
+        if (!map.hasLayer(layer)) map.addLayer(layer);
+      } else if (map.hasLayer(layer)) {
+        map.removeLayer(layer);
+      }
+    });
+    currentBaseLayerKey = layerKey;
+    syncLayerMenuState();
+  }
+
+  function toggleOverlayLayer(layerKey, visible) {
+    const layer = overlayLayerRefs[layerKey];
+    if (!layer) return;
+    if (visible) {
+      if (!map.hasLayer(layer)) map.addLayer(layer);
+    } else if (map.hasLayer(layer)) {
+      map.removeLayer(layer);
+    }
+    syncLayerMenuState();
+  }
+
+  function syncLayerMenuState() {
+    if (!mapLayerMenu) return;
+    const baseInput = mapLayerMenu.querySelector(`input[name="inrsBaseLayer"][value="${currentBaseLayerKey}"]`);
+    if (baseInput) baseInput.checked = true;
+    const footprintToggle = document.getElementById("toggleFootprint");
+    const classificationToggle = document.getElementById("toggleClassification");
+    if (footprintToggle) {
+      footprintToggle.checked = !!(overlayLayerRefs.footprint && map.hasLayer(overlayLayerRefs.footprint));
+    }
+    if (classificationToggle) {
+      classificationToggle.checked = !!(overlayLayerRefs.classification && map.hasLayer(overlayLayerRefs.classification));
+    }
   }
 
   function applyTranslations() {
@@ -337,11 +471,66 @@ document.addEventListener("DOMContentLoaded", function () {
       node.textContent = translateGroupName(node.dataset.groupLabel);
     });
     if (languageSelect) languageSelect.value = currentLanguage;
+    renderDataSourcesPanel();
     renderClassFilters();
     renderClassLegend();
     renderObservationsInfoPanel();
     applyObservationTypeColors();
     refreshLayerControl();
+  }
+
+  function renderDataSourcesPanel() {
+    if (!dataSourceListEl) return;
+    dataSourceListEl.innerHTML = `
+      <div class="data-source-card">
+        <div class="data-source-block">
+          <div class="data-source-kicker">
+            <i class="fa-solid fa-satellite"></i>
+            <span>${escapeHtml(t("data_sources_satellite_tag"))}</span>
+          </div>
+          <div class="data-source-title-row">
+            <h3 class="data-source-title">${escapeHtml(t("data_sources_satellite_title"))}</h3>
+            <button type="button" class="data-source-info-btn" data-info-toggle aria-label="Afficher info">i</button>
+          </div>
+          <p class="data-source-text">${escapeHtml(t("data_sources_satellite_text"))}</p>
+        </div>
+        <div class="data-source-block">
+          <div class="data-source-kicker">
+            <i class="fa-solid fa-seedling"></i>
+            <span>${escapeHtml(t("data_sources_observation_tag"))}</span>
+          </div>
+          <div class="data-source-title-row">
+            <h3 class="data-source-title">${escapeHtml(t("data_sources_observation_title"))}</h3>
+            <button type="button" class="data-source-info-btn" data-info-toggle aria-label="Afficher info">i</button>
+          </div>
+          <p class="data-source-text">${escapeHtml(t("data_sources_observation_text"))}</p>
+          <a class="data-source-link" href="https://www.inaturalist.ca/projects/inrs-reseau-biodiversite-sur-le-campus" target="_blank" rel="noreferrer">
+            <img class="data-source-image" src="NPU_INRS.png" alt="Reseau biodiversite au campus INRS">
+            <div class="data-source-link-note">${escapeHtml(t("data_sources_visit_project"))}</div>
+          </a>
+        </div>
+      </div>
+    `;
+    attachDataSourceInfoToggles(dataSourceListEl);
+  }
+
+  function attachDataSourceInfoToggles(container) {
+    container.querySelectorAll("[data-info-toggle]").forEach((button) => {
+      button.addEventListener("click", function (event) {
+        event.stopPropagation();
+        const currentBlock = this.closest(".data-source-block");
+        if (!currentBlock) return;
+        const shouldOpen = !currentBlock.classList.contains("is-open");
+        container.querySelectorAll(".data-source-block").forEach((block) => block.classList.remove("is-open"));
+        if (shouldOpen) currentBlock.classList.add("is-open");
+      });
+    });
+
+    container.querySelectorAll(".data-source-block").forEach((block) => {
+      block.addEventListener("mouseleave", function () {
+        this.classList.remove("is-open");
+      });
+    });
   }
 
   function normalizeClassEntry(entry, index) {
@@ -351,7 +540,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const surfaceM2 = Number(entry.surface_m2 ?? 0);
     return {
       id: safeId,
-      name: entry.name || entry.nom_classe || `Classe ${safeId}`,
+      name: entry.name || entry.nom_classe || classNameById[safeId] || `Classe ${safeId}`,
       color: entry.color || classColorById[safeId] || fallbackPalette[index % fallbackPalette.length],
       surface_m2: Number.isNaN(surfaceM2) ? 0 : surfaceM2
     };
@@ -557,11 +746,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function createLayer(year) {
     const prefix = campusConfig[currentCampus].layerPrefix;
-    return L.tileLayer.wms(geoserverBase + "/ne/wms", {
+    const layer = L.tileLayer.wms(geoserverBase + "/ne/wms", {
       layers: "ne:" + prefix + year,
       format: "image/png",
       transparent: true
     });
+    layer.on("load", applyClassificationClip);
+    layer.on("add", applyClassificationClip);
+    return layer;
   }
 
   async function fetchClasses(year) {
@@ -1144,6 +1336,7 @@ document.addEventListener("DOMContentLoaded", function () {
     currentCampus = name;
     const campus = campusConfig[name];
     const boundaryCollection = await getCampusBoundary(name);
+    currentCampusBoundary = boundaryCollection;
     fitCampusBoundary(boundaryCollection, campus.center, campus.zoom);
 
     if (campusMarker) {
@@ -1166,7 +1359,12 @@ document.addEventListener("DOMContentLoaded", function () {
     await loadAllProjectObservations(true);
     startObservationsAutoRefresh();
     refreshLayerControl();
+    applyClassificationClip();
   };
+
+  map.on("zoomend moveend resize", function () {
+    applyClassificationClip();
+  });
 
   map.on("click", function (e) {
     if (!classifLayer) return;
@@ -1301,6 +1499,38 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  loadCampus("qc");
+  if (mapLayerToggle && mapLayerMenu) {
+    mapLayerToggle.addEventListener("click", function (event) {
+      event.stopPropagation();
+      mapLayerMenu.classList.toggle("is-open");
+    });
+
+    mapLayerMenu.querySelectorAll('input[name="inrsBaseLayer"]').forEach((input) => {
+      input.addEventListener("change", function () {
+        if (this.checked) setBaseLayer(this.value);
+      });
+    });
+
+    const footprintToggle = document.getElementById("toggleFootprint");
+    const classificationToggle = document.getElementById("toggleClassification");
+    if (footprintToggle) {
+      footprintToggle.addEventListener("change", function () {
+        toggleOverlayLayer("footprint", this.checked);
+      });
+    }
+    if (classificationToggle) {
+      classificationToggle.addEventListener("change", function () {
+        toggleOverlayLayer("classification", this.checked);
+      });
+    }
+
+    document.addEventListener("click", function (event) {
+      if (!event.target.closest("#mapLayerMenu")) {
+        mapLayerMenu.classList.remove("is-open");
+      }
+    });
+  }
+
+  loadCampus("laval");
   applyTranslations();
 });
