@@ -1,0 +1,336 @@
+
+// ***--- 1. Synthèse d'images pour l'été ---***
+
+var Etude_ULAVAL = Etude_ULAVAL.geometry();
+
+// Filtre ULAVAL
+var Ulaval_filtre_date_2025 = Sentinel2 // collection d'images
+  .filterDate('2025-06-01', '2025-08-31') // filtre l'été
+  .filterBounds(Etude_ULAVAL) // filtre region ULAVAL
+  .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 5)) // filtre pourcentage des nuages
+  .median(); // Filtre median
+  
+  
+// Ajout de la couche en vraie couleurs filtrée dans le map
+var Ulaval_clip = Ulaval_filtre_date_2025 // coupe sur la zone d'étude
+  .clip(Etude_ULAVAL);
+  
+Map.centerObject(Ulaval_clip,15); // zoom sur la zone d'étude
+
+Map.addLayer(Ulaval_clip, {
+  bands: ['B4', 'B3', 'B2'],  // R,G,B vrai couleurs
+  min: 500,
+  max: 4000
+  }, 'Sentinel-2 section Ulaval');
+  
+
+// bandes des à utiliser
+var bands = ['B2','B3','B4','B5','B6','B8','B11','B12']; // Toutes les bandes à utiliser 10m et 20m
+var bands10m =  ['B2','B3','B4','B8']; // Bleu, Vert, Rouge, NIR à 10m
+var bands20m = ['B5','B6','B11','B12']; // SWIR et Red edge
+
+
+// ajout des bandes des 20m réchantionnées aux 10m à utiliser
+var imageRGBNI2 = Ulaval_filtre_date_2025
+.select(bands10m)
+.addBands((Ulaval_filtre_date_2025.select(bands20m)).reproject({
+    crs: Ulaval_filtre_date_2025.select(bands10m).projection(),
+    scale: 10
+  }))
+.divide(10000);
+
+/*
+*** Attention si vous decidez de forcer le rééchantionnage bicubique ou bilinaire par resample,
+regardez les valeurs Min et Max des bandes pour être certain que ça fonctionne, pour mon cas,
+aucun erreur a été rétourné, mais les valeurs des pixels est resté pratiquement identique pour
+tous, donc un problème du fonctionnement de la méthode à surveiller (par défaut il fait
+plus proche voisin).***
+*/
+
+
+// ***--- 2. Régions d'interêts---***
+
+// Ajout des geometries des sites entrainement comme variables dans le script
+var Gazon_class = ee.FeatureCollection(Gazon) // classe gazon
+  .map(function(f){return f.set('class', 0);});
+var RoutesParkings_class = ee.FeatureCollection(SurfacesImpermeables) // classe surface impermeables
+  .map(function(f){return f.set('class', 1);});
+var Batiments_class = ee.FeatureCollection(Infrastructure) // classe Infrastructure
+  .map(function(f){return f.set('class', 2);});
+var Boise_class = ee.FeatureCollection(BoiseUrbain) // classe boisé
+  .map(function(f){return f.set('class', 3);});
+var Eau_class = ee.FeatureCollection(EauVisible) // classe eau
+  .map(function(f){return f.set('class', 7);});
+var SurfacesMin_class = ee.FeatureCollection(SurfacesMinerales) // classe surfaces minerales
+  .map(function(f){return f.set('class', 8);});
+var JardinAgricUrbain_class = ee.FeatureCollection(JardinAgriculUrbaine) // classe jardin d'agriculture urbaine
+  .map(function(f){return f.set('class', 10);});
+  
+  /*
+*** Certaintes classes ont été fusionnées dû à certains problèmes spectrale et spatiales,
+Pour cette raison vous voyez des trous dans la numérotation ***
+*/
+ 
+
+// création d'un ROI à partir des différents features
+var trainingProposition = Gazon_class.merge(RoutesParkings_class).merge(Batiments_class)
+.merge(Boise_class).merge(Eau_class).merge(SurfacesMin_class)
+.merge(JardinAgricUrbain_class);
+
+
+//  pour l'entrainement des algo 2025
+var trainingClass_proposition_1 = imageRGBNI2.sampleRegions({
+    collection: trainingProposition,
+    properties: ['class'],
+    scale: 10, // Résolution spatiale
+    geometries: true
+});
+
+
+// Ajouter une colonne aléatoire pour le split
+var withRandom = trainingClass_proposition_1.randomColumn('random');
+
+
+// 70% pour l'entraînement
+var trainSet_proposition_1 = withRandom.filter(ee.Filter.lt('random', 0.7));
+
+
+// 30% pour la validation
+var validationSet = withRandom.filter(ee.Filter.gte('random', 0.7));
+
+
+// ***--- 3. Test de séparabilité ---***
+
+// -------------------------------------------------------------
+// Fonction : Distance Jeffries–Matusita entre deux classes
+// -------------------------------------------------------------
+
+function jeffriesMatusitaFinal(image, geomA, geomB, scale) {
+  
+  // Moyenne pour chaque géométrie
+  var meanA = ee.Array(bands.map(function(b) {
+    return ee.Number(image.reduceRegion({
+      reducer: ee.Reducer.mean(),
+      geometry: geomA,
+      scale: scale,
+      maxPixels: 1e9
+    }).get(b));
+  }));
+
+  var meanB = ee.Array(bands.map(function(b) {
+    return ee.Number(image.reduceRegion({
+      reducer: ee.Reducer.mean(),
+      geometry: geomB,
+      scale: scale,
+      maxPixels: 1e9
+    }).get(b));
+  }));
+  
+  
+ var imageArray = image.toArray();
+
+  // Covariance pour chaque géométrie
+  var covA_dict = imageArray.reduceRegion({
+    reducer: ee.Reducer.centeredCovariance(),
+    geometry: geomA,
+    scale: scale,
+    maxPixels: 1e9
+  })
+  
+
+  var covB_dict = imageArray.reduceRegion({
+    reducer: ee.Reducer.centeredCovariance(),
+    geometry: geomB,
+    scale: scale,
+    maxPixels: 1e9
+  })
+  
+  
+  // Extraction sous forme d'array
+  var covA = ee.Array(covA_dict.get('array'));
+  var covB = ee.Array(covB_dict.get('array'));
+  
+
+  // Différence des moyennes
+  var diff = meanA.subtract(meanB).reshape([bands.length, 1]);
+  
+
+  // Covariance moyenne avec régularisation
+  var covMean = covA.add(covB).divide(2);
+  var covMeanReg = covMean.add(ee.Array.identity(bands.length).multiply(1e-6));
+  
+
+  // Inverse de Σ
+  var covInv = covMeanReg.matrixInverse();
+
+  // Terme 1
+  var term1 = diff.transpose().matrixMultiply(covInv).matrixMultiply(diff).get([0,0]).divide(8);
+
+  // Terme 2
+  var detA = covA.matrixDeterminant();
+  var detB = covB.matrixDeterminant();
+  var detMean = covMeanReg.matrixDeterminant();
+  var term2 = detMean.divide(detA.multiply(detB).sqrt()).log().divide(2);
+
+  // Distance JM
+  var B = term1.add(term2);
+  var JM = ee.Number(2).multiply(ee.Number(1).subtract(B.multiply(-1).exp()));
+
+  return JM;
+}
+
+// -------------------------------------------------------------
+// Fonction : Fin de fonction Distance Jeffries–Matusita entre deux classes
+// -------------------------------------------------------------
+
+
+// --- Calcul JM Gazon vs All ---
+var JM_Gazon_SurfImp = jeffriesMatusitaFinal(imageRGBNI2, Gazon, SurfacesImpermeables, 10);
+print('Distance Jeffries-Matusita : Gazon vs Surface impermeables =', JM_Gazon_SurfImp);
+
+var JM_Gazon_Inf = jeffriesMatusitaFinal(imageRGBNI2, Gazon, Infrastructure, 10);
+print('Distance Jeffries-Matusita : Gazon vs Infrastructure =', JM_Gazon_Inf);
+
+var JM_Gazon_Boise = jeffriesMatusitaFinal(imageRGBNI2, Gazon, BoiseUrbain, 10);
+print('Distance Jeffries-Matusita : Gazon vs Boise =', JM_Gazon_Boise);
+
+var JM_Gazon_Eau = jeffriesMatusitaFinal(imageRGBNI2, Gazon, EauVisible, 10);
+print('Distance Jeffries-Matusita : Gazon vs Eau =', JM_Gazon_Eau);
+
+var JM_Gazon_SurfMinerales = jeffriesMatusitaFinal(imageRGBNI2, Gazon, SurfacesMinerales, 10);
+print('Distance Jeffries-Matusita : Gazon vs Surfaces minerales =', JM_Gazon_SurfMinerales);
+
+var JM_Gazon_JardinAgriUrbain = jeffriesMatusitaFinal(imageRGBNI2, Gazon, JardinAgriculUrbaine, 10);
+print('Distance Jeffries-Matusita : Gazon vs Jardin agricultaire urbain =', JM_Gazon_JardinAgriUrbain);
+
+
+// --- Calcul JM Surfaces impermeables vs All ---
+var JM_SurfImp_Infr = jeffriesMatusitaFinal(imageRGBNI2, SurfacesImpermeables, Infrastructure, 10);
+print('Distance Jeffries-Matusita : Surface impermeables vs Infrastructure =', JM_SurfImp_Infr);
+
+var JM_SurfImp_Boise = jeffriesMatusitaFinal(imageRGBNI2, SurfacesImpermeables, BoiseUrbain, 10);
+print('Distance Jeffries-Matusita : Surface impermeables vs Boise =', JM_SurfImp_Boise);
+
+
+var JM_SurfImp_Eau = jeffriesMatusitaFinal(imageRGBNI2, SurfacesImpermeables, EauVisible, 10);
+print('Distance Jeffries-Matusita : Surface impermeables vs Eau =', JM_SurfImp_Eau);
+
+var JM_SurfImp_SurfMin = jeffriesMatusitaFinal(imageRGBNI2, SurfacesImpermeables, SurfacesMinerales, 10);
+print('Distance Jeffries-Matusita : Surface impermeables vs Surfaces minerales =', JM_SurfImp_SurfMin);
+
+
+// --- Calcul JM Infrastructure vs All ---
+var JM_Infr_Boise = jeffriesMatusitaFinal(imageRGBNI2, Infrastructure, BoiseUrbain, 10);
+print('Distance Jeffries-Matusita : Infrastructures vs Boise =', JM_Infr_Boise);
+
+
+var JM_Infr_Eau = jeffriesMatusitaFinal(imageRGBNI2, Infrastructure, EauVisible, 10);
+print('Distance Jeffries-Matusita : Infrastructures vs Eau =', JM_Infr_Eau);
+
+var JM_Infr_SurfMine = jeffriesMatusitaFinal(imageRGBNI2, Infrastructure, SurfacesMinerales, 10);
+print('Distance Jeffries-Matusita : Infrastructures vs Surfaces minerales =', JM_Infr_SurfMine);
+
+
+var JM_Infr_JardUrbain = jeffriesMatusitaFinal(imageRGBNI2, Infrastructure, JardinAgriculUrbaine, 10);
+print('Distance Jeffries-Matusita : Infrastructures vs Jardin dagriculture urbaine =', JM_Infr_JardUrbain);
+
+
+// --- Calcul JM Boise vs All ---
+var JM_Boise_Eau = jeffriesMatusitaFinal(imageRGBNI2, BoiseUrbain, EauVisible , 10);
+print('Distance Jeffries-Matusita : Boise vs Eau =', JM_Boise_Eau);
+
+var JM_Boise_SurfMine = jeffriesMatusitaFinal(imageRGBNI2, BoiseUrbain, SurfacesMinerales , 10);
+print('Distance Jeffries-Matusita : Boise vs Surfaces Minerales =', JM_Boise_SurfMine);
+
+var JM_Boise_JardinUrbain = jeffriesMatusitaFinal(imageRGBNI2, BoiseUrbain, JardinAgriculUrbaine , 10);
+print('Distance Jeffries-Matusita : Boise vs Jardin dagriculture urbaine =', JM_Boise_JardinUrbain);
+
+
+// --- Calcul JM Eau visible vs All ---
+
+var JM_Eau_SurfMine = jeffriesMatusitaFinal(imageRGBNI2, EauVisible, SurfacesMinerales , 10);
+print('Distance Jeffries-Matusita : Eau visible vs Surfaces Minerales  =', JM_Eau_SurfMine);
+
+var JM_Eau_JardinUrbain = jeffriesMatusitaFinal(imageRGBNI2, EauVisible, JardinAgriculUrbaine , 10);
+print('Distance Jeffries-Matusita : Eau visible vs Jardin agriculture urbaine  =', JM_Eau_JardinUrbain);
+
+
+// --- Calcul JM Surfaces minerales vs All ---
+
+var JM_SurfMine_JardinUrbain = jeffriesMatusitaFinal(imageRGBNI2, SurfacesMinerales, JardinAgriculUrbaine , 10);
+print('Distance Jeffries-Matusita : Surfaces Minerales vs Jardin Agriculture Urbaine  =', JM_SurfMine_JardinUrbain);
+
+
+// ***--- 4. Classification---***
+
+// -- Classification par Random Forest --
+
+var rf_2025_propo1 = ee.Classifier.smileRandomForest(500).train({
+  features: trainSet_proposition_1,
+  classProperty: 'class',
+  inputProperties: bands
+});
+
+var image_RF_2025 = imageRGBNI2.classify(rf_2025_propo1);
+
+var image_RF_2025_clip = image_RF_2025 // coupe sur la zone d'étude
+  .clip(Etude_ULAVAL);
+
+// Ajout de la couche
+Map.addLayer(image_RF_2025_clip, {min:0, max:11, palette:
+['#88d648','#bfbfbf','#de7938','#0ea300','#ffcbba','#c28097', '#c1d6bb', '#3caaff', '#ffb0a0', '#95975c', '#bf62ff', '#c0c285']}, 
+'Random Forest 2025 propo 1');
+
+
+// --- Smmothing ---
+var seeds = ee.Algorithms.Image.Segmentation.seedGrid(4);
+var snic = ee.Algorithms.Image.Segmentation.SNIC({
+  image: imageRGBNI2,
+  size: 4,
+  compactness: 0.6,
+  connectivity: 8,
+  neighborhoodSize: 8,
+  seeds: seeds
+});
+
+
+//Regroupement des pixels
+var objectClass_2025_Propo1 = image_RF_2025_clip
+  .addBands(snic.select('clusters'))
+  .reduceConnectedComponents({
+    reducer: ee.Reducer.mode(),
+    labelBand: 'clusters'
+  });
+  
+var objectClass_2025_clip = objectClass_2025_Propo1 // coupe sur la zone d'étude
+  .clip(Etude_ULAVAL);
+
+Map.addLayer(objectClass_2025_clip, {min:0, max:11, palette:
+['#88d648','#bfbfbf','#de7938','#0ea300','#ffcbba','#c28097','#c1d6bb', '#3caaff', '#ffb0a0', '#95975c', '#bf62ff', '#c0c285']}, 
+'Classification 2025'); // Ajout sur la carte
+
+
+// ***--- 5. Matrice de confusion et validation ---***
+  
+// Classify the validation set to get predicted classes.
+var validated  = validationSet.classify(rf_2025_propo1);
+
+// Get the error matrix (confusion matrix) from the validated FeatureCollection.
+var errorMatrix = validated.errorMatrix('class', 'classification');
+print('Validation Confusion Matrix:', errorMatrix);
+
+
+// Extract metrics:
+print('Overall Accuracy:', errorMatrix.accuracy());
+print('Kappa Coefficient:', errorMatrix.kappa());
+print('Producer Accuracy:', errorMatrix.producersAccuracy());
+print('Consumer Accuracy:', errorMatrix.consumersAccuracy());
+
+
+// ***--- 6. Exportation des données ---***
+
+Export.table.toAsset({
+  collection: trainSet_proposition_1,
+  description: 'Training_Ulaval_2025',
+  assetId: 'endmember'
+});
