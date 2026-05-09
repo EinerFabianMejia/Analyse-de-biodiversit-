@@ -9,6 +9,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 import pickle
 
+from geo.Geoserver import Geoserver
+
 ee.Initialize(project='project-id-ee-einerfabianmejia')
 
 
@@ -237,4 +239,71 @@ while not found:
 
         print("Toujours en attente...")
         time.sleep(60)
+
+
+# -----------------------------------
+# CHARGER DANS POSTGRESQL
+# -----------------------------------
+
+shp_path = LOCAL_FOLDER + "/" + 'Habitats_INRS_Laval_' + str(year) + ".shp"
+table_name = "temp"
+db_host = "localhost"
+db_name = "cartographie_biodiversite_INRS_LAVAL"
+db_user = "postgres"
+
+cmd = f'shp2pgsql -I -s 4326 "{shp_path}" {table_name} | psql -h {db_host} -d {db_name} -U {db_user}'
+try:
+    subprocess.run(cmd, shell=True, check=True)
+    print("Shapefile imported successfully.")
+except subprocess.CalledProcessError as e:
+    logging.error(f"Error importing shapefile: {e}")
+    print("Failed to import shapefile.")
+
+query = f"""
+CREATE TABLE IF NOT EXISTS classification_INRS_LAVAL_{year} (
+    id SERIAL,
+    nom_classe VARCHAR(255),
+    annee INT,
+    num_classe INT,
+    superficie DEC(32,3),
+    geom GEOMETRY(MULTIPOLYGON, 4326),
+    PRIMARY KEY(id)
+);
+
+INSERT INTO classification_INRS_LAVAL_{year} (nom_classe, annee, num_classe, superficie, geom)
+SELECT nom_classe, {year}, class, surface_m2, geom
+FROM {table_name};
+
+DROP TABLE {table_name};
+"""
+
+cmd = f'psql -h {db_host} -d {db_name} -U {db_user} -c "{query}"'
+
+try:
+    subprocess.run(cmd, shell=True, check=True)
+    print("Table rearranged successfully.")
+except subprocess.CalledProcessError as e:
+    logging.error(f"Error rearranging table: {e}")
+    print("Failed to rearrange table.")
+
+# -----------------------------------
+# Publier dans GeoServer
+# -----------------------------------
+
+geo = Geoserver('http://localhost:8080/geoserver', username='admin', password='geoserver')
+
+geo.publish_featurestore(
+    workspace='ne',
+    store_name='Connexion_PostGIS',
+    pg_table= "classification_INRS_Laval" + str(year)
+)
+
+workspace = 'ne'
+sld_path = "/home/projet-genie/Téléchargements/Projet-2-linus/classification_ulaval.sld"
+layer_name = "classification_ulaval_" + str(year)
+style_name = 'classification_style'
+
+geo.upload_style(path=sld_path, workspace=workspace, style_name=style_name)
+geo.publish_style(layer_name=layer_name, style_name=style_name, workspace=workspace)
+
 
